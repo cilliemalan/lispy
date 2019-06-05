@@ -35,6 +35,11 @@ const readInternal = (text, offset = 0, len = 0) => {
                     currentform += c;
                     break;
                 }
+                else if (c === '"') {
+                    state = "string";
+                    currentform += c;
+                    break;
+                }
                 else if (rxSpace.test(c)) {
                     break;
                 }
@@ -75,11 +80,28 @@ const readInternal = (text, offset = 0, len = 0) => {
                     throw "unexpected character found while parsing symbol: " + c;
                 }
                 break;
+            case "string":
+                if (c == '"') {
+                    currentform += c;
+                    let numslashes = 0;
+                    for (let j = i - 1; j >= 0; j--) {
+                        if (text[j] === '\\') numslashes++;
+                        else break;
+                    }
+                    if (numslashes % 2 == 0) {
+                        return result(JSON.parse(currentform))
+                    }
+                } else if (c == "") {
+                    throw "unexpected end of file while parsing string";
+                } else {
+                    currentform += c;
+                }
+                break;
             default:
                 throw "unrecognized state: " + state;
         }
     }
-    
+
     throw "exited loop without return";
 }
 

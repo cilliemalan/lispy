@@ -12,7 +12,13 @@ const tests = {
     'read ignores leading spaces': () => assert.strictEqual(read("  123"), 123),
 
     'read reads a symbol': () => assert.strictEqual(read("hello"), Symbol.for('hello')),
-    'read reads a symbol with leading spaces': () => assert.strictEqual(read("  helloA"), Symbol.for(' helloA')),
+    'read reads a symbol with leading spaces': () => assert.strictEqual(read("  helloA"), Symbol.for('helloA')),
+
+    'read reads a string': () => assert.strictEqual(read('"hello"'), "hello"),
+    'read reads a string with escapes': () => assert.strictEqual(read('"hello\\n"'), "hello\n"),
+    'read reads a string with double escapes': () => assert.strictEqual(read('"hello\\\\n"'), "hello\\n"),
+    'read reads a string with escaped quotes': () => assert.strictEqual(read('"hello\\""'), "hello\""),
+    'read reads a string with escaped confusion': () => assert.strictEqual(read('"he\\\\llo\\\\\\"\\""'), "he\\llo\\\"\""),
 }
 
 
