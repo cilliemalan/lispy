@@ -22,6 +22,7 @@ const readInternal = (text, offset = 0) => {
     const start = (c) => c === "(" || c === "[" || c === "{";
     const end = (c) => c === ")" || c === "]" || c === "}";
     const space = (c) => /\s/.test(c) || c === "" || end(c) || start(c);
+    const corresponding = (a, b) => a == '(' && b == ')' || a == '[' && b == ']' || a == '{' && b == '}';
 
     let state = "form";
     let currentform = "";
@@ -67,6 +68,9 @@ const readInternal = (text, offset = 0) => {
                             }
                         }
                         if (end(c2)) {
+                            if(!corresponding(c,c2)) {
+                                throw `the opening tag ${c} does not correspond to the found closing tag ${c2}`;
+                            }
                             i++;
                             if (res.length == 0) throw "unexpected empty list";
                             else return result(res);

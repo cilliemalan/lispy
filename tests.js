@@ -29,6 +29,8 @@ const tests = {
     'read reads nested lists': () => assert.deepStrictEqual(read('(1 (2 3) 4)'), [1, [2, 3], 4]),
     'read reads nested lists without spaces': () => assert.deepStrictEqual(read('(1(2 3)4)'), [1, [2, 3], 4]),
     'read reads nested lists with symbols without spaces': () => assert.deepStrictEqual(read('(a(b c)d)'), [Symbol.for('a'), [Symbol.for('b'), Symbol.for('c')], Symbol.for('d')]),
+    'read reads nested lists with different brackets': () => assert.deepStrictEqual(read('(1 [2 {3}] 4)'), [1, [2, [3]], 4]),
+    'read expects matching brackets': () => assert.throws(() => read('(1 2 3}'), /does not correspond/)
 }
 
 
