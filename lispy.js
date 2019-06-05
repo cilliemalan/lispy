@@ -4,7 +4,8 @@ const read = (text) => {
     return r;
 }
 
-const readInternal = (text, offset = 0, len = 0) => {
+const readInternal = (text, offset = 0) => {
+    const len = text.length;
     if (len == 0) len = text.length;
     if (len == 0) return undefined;
 
@@ -14,8 +15,13 @@ const readInternal = (text, offset = 0, len = 0) => {
     const rxSymbolRest = /[_$a-zA-Z0-9\xA0-\uFFFF]/i;
 
     let i = offset;
-    const result = (r) => [r, i - offset];
-    const space = (c) => /\s/.test(c) || c === "";
+    const result = (r) => {
+        while (rxSpace.test(text[i])) i++;
+        return [r, i - offset];
+    }
+    const start = (c) => c === "(" || c === "[" || c === "{";
+    const end = (c) => c === ")" || c === "]" || c === "}";
+    const space = (c) => /\s/.test(c) || c === "" || end(c) || start(c);
 
     let state = "form";
     let currentform = "";
@@ -43,7 +49,33 @@ const readInternal = (text, offset = 0, len = 0) => {
                 else if (rxSpace.test(c)) {
                     break;
                 }
-                else if (c === "") {
+                else if (start(c)) {
+                    ///////
+                    i++;
+                    const res = [];
+                    for (; ;) {
+                        const [form, advance] = readInternal(text, i);
+                        i += advance;
+                        const c2 = i < len ? text[i] : "";
+                        if (form) {
+                            res.push(form);
+                        } else {
+                            if (end(c2) && res.length == 0) {
+                                return result(null);
+                            } else {
+                                throw "unexpected situation";
+                            }
+                        }
+                        if (end(c2)) {
+                            i++;
+                            if (res.length == 0) throw "unexpected empty list";
+                            else return result(res);
+                        } else if (c2 == "") {
+                            throw "unexpected eof while reading list";
+                        }
+                    }
+                }
+                else if (end(c)) {
                     return result(undefined);
                 }
                 else {
@@ -89,6 +121,7 @@ const readInternal = (text, offset = 0, len = 0) => {
                         else break;
                     }
                     if (numslashes % 2 == 0) {
+                        i++;
                         return result(JSON.parse(currentform))
                     }
                 } else if (c == "") {

@@ -1,8 +1,6 @@
 const { read } = require('./lispy');
 const assert = require('assert');
 
-assert.jsonEqual = (a, b) => assert.strictEqual(JSON.stringify(a), JSON.stringify(b));
-
 const tests = {
     'read parses simple number': () => assert.strictEqual(read("123"), 123),
     'read parses a number with decimal': () => assert.strictEqual(read("123.123"), 123.123),
@@ -19,6 +17,18 @@ const tests = {
     'read reads a string with double escapes': () => assert.strictEqual(read('"hello\\\\n"'), "hello\\n"),
     'read reads a string with escaped quotes': () => assert.strictEqual(read('"hello\\""'), "hello\""),
     'read reads a string with escaped confusion': () => assert.strictEqual(read('"he\\\\llo\\\\\\"\\""'), "he\\llo\\\"\""),
+
+    'read reads a list with strings': () => assert.deepStrictEqual(read('("a" "b" "c")'), ["a", "b", "c"]),
+    'read reads a list numbers': () => assert.deepStrictEqual(read('(1 2 3)'), [1, 2, 3]),
+    'read reads a list symbols': () => assert.deepStrictEqual(read('(a b c)'), [Symbol.for('a'), Symbol.for('b'), Symbol.for('c')]),
+    'read reads a list numbers and spaces': () => assert.deepStrictEqual(read('( 1 \t 2 \n 3 )'), [1, 2, 3]),
+    'read reads a list numbers and more spaces': () => assert.deepStrictEqual(read(' ( 1 \t 2 \n 3 )\t'), [1, 2, 3]),
+    'read reads a list with one number': () => assert.deepStrictEqual(read('(1)'), [1]),
+    'read reads empty list as null': () => assert.deepStrictEqual(read('()'), null),
+    'read reads empty list as null with spaces': () => assert.deepStrictEqual(read('  (  )  '), null),
+    'read reads nested lists': () => assert.deepStrictEqual(read('(1 (2 3) 4)'), [1, [2, 3], 4]),
+    'read reads nested lists without spaces': () => assert.deepStrictEqual(read('(1(2 3)4)'), [1, [2, 3], 4]),
+    'read reads nested lists with symbols without spaces': () => assert.deepStrictEqual(read('(a(b c)d)'), [Symbol.for('a'), [Symbol.for('b'), Symbol.for('c')], Symbol.for('d')]),
 }
 
 
@@ -29,7 +39,7 @@ Object.keys(tests).forEach(t => {
         process.stdout.write(`OK\n`);
     } catch (e) {
         process.stdout.write(`FAIL\n`);
-        if(e.message) console.error(e.message);
+        if (e.message) console.error(e.message);
         else console.error(e);
     }
 });
