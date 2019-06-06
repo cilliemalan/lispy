@@ -1,6 +1,6 @@
 const { read, dot, Pair } = require('./reader');
 const assert = require('assert');
-const { evaluate } = require('./lispy');
+const { evaluate } = require('./evaluate');
 
 const tests = {
 
