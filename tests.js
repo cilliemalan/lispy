@@ -1,4 +1,4 @@
-const { read, dot, Pair } = require('./lispy');
+const { read, dot, Pair } = require('./reader');
 const assert = require('assert');
 
 const tests = {
@@ -39,6 +39,10 @@ const tests = {
     'read reads a list with one number': () => assert.deepStrictEqual(read('(1)'), [1]),
     'read reads empty list as null': () => assert.deepStrictEqual(read('()'), null),
     'read reads empty list as null with spaces': () => assert.deepStrictEqual(read('  (  )  '), null),
+    'read reads empty list as null inside other list 1': () => assert.deepStrictEqual(read('(1 2 3 ())'), [1, 2, 3, null]),
+    'read reads empty list as null inside other list 2': () => assert.deepStrictEqual(read('(1 2 () 3) '), [1, 2, null, 3]),
+    'read reads empty list as null inside other list 3': () => assert.deepStrictEqual(read('(1 (()) () 3) '), [1, [null], null, 3]),
+    'read reads empty list as null inside other list 4': () => assert.deepStrictEqual(read('(1 ((())) () 3) '), [1, [[null]], null, 3]),
     'read reads nested lists': () => assert.deepStrictEqual(read('(1 (2 3) 4)'), [1, [2, 3], 4]),
     'read reads nested lists without spaces': () => assert.deepStrictEqual(read('(1(2 3)4)'), [1, [2, 3], 4]),
     'read reads nested lists with symbols without spaces': () => assert.deepStrictEqual(read('(a(b c)d)'), [Symbol.for('a'), [Symbol.for('b'), Symbol.for('c')], Symbol.for('d')]),
@@ -58,9 +62,12 @@ const tests = {
     'read supports quote with even more whitespace': () => assert.deepStrictEqual(read(" ( 1 '\n(1 2)  3 ) "), [1, [Symbol.for('quote'), [1, 2]], 3]),
 
     'read supports dot': () => assert.deepStrictEqual(read("(1 . 2)"), new Pair(1, 2)),
-    'read does not support improper dot 1':() => assert.throws(() => read("(1 . 2 3)")),
-    'read does not support improper dot 2':() => assert.throws(() => read("(1 2 . 3)")),
-    'read does not support improper dot 3':() => assert.throws(() => read(".")),
+    'read turns dotted pair into list if possible 1': () => assert.deepStrictEqual(read("(1 . (2 3))"), [1, 2, 3]),
+    'read turns dotted pair into list if possible 2': () => assert.deepStrictEqual(read("((1) . (2 3))"), [[1], 2, 3]),
+    'read turns dotted pair into list if possible 3': () => assert.deepStrictEqual(read("(1 . ())"), [1]),
+    'read does not support improper dot 1': () => assert.throws(() => read("(1 . 2 3)")),
+    'read does not support improper dot 2': () => assert.throws(() => read("(1 2 . 3)")),
+    'read does not support improper dot 3': () => assert.throws(() => read(".")),
 }
 
 
