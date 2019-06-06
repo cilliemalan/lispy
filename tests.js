@@ -1,7 +1,10 @@
 const { read, dot, Pair } = require('./reader');
 const assert = require('assert');
+const { evaluate } = require('./lispy');
 
 const tests = {
+
+    // reader tests
     'read parses simple number': () => assert.strictEqual(read("123"), 123),
     'read parses a number with decimal': () => assert.strictEqual(read("123.123"), 123.123),
     'read parses a number starting with decimal': () => assert.strictEqual(read(".123"), .123),
