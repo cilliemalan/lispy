@@ -1,6 +1,14 @@
+const util = require('util');
+
+class Pair {
+    constructor(a,b) { this.a = a; this.b = b; }
+}
+
+const dot = Symbol('.');
 
 const read = (text) => {
     const [r, _] = readInternal(text);
+    if(r === dot) throw "unexpected .";
     return r;
 }
 
@@ -11,12 +19,25 @@ const readInternal = (text, offset = 0) => {
 
     const rxSpace = /\s/;
     const rxNumber = /[0-9.+-]/;
-    const rxSymbol = /[-+*/!=$%^&_=?:~$a-zA-Z\xA0-\uFFFF]/i;
+    const rxSymbol = /[-.0-9<>+*/!=$%^&_=?:~$a-zA-Z\xA0-\uFFFF]/i;
     const rxQuote = /['`,]/;
 
     let i = offset;
     const result = (r) => {
         while (rxSpace.test(text[i])) i++;
+
+        if(util.isArray(r)) {
+            // check for dots
+            if(r.filter(x => x === dot).length != 0) {
+                // there is a dot somewhere
+                if(r.length === 3 && r[0] !== dot && r[1] === dot && r[2] !== dot) {
+                    r = new Pair(r[0], r[2]);
+                } else {
+                    throw "unexpected dot";
+                }
+            }
+        }
+
         return [r, i - offset];
     }
     const start = (c) => c === "(" || c === "[" || c === "{";
@@ -122,7 +143,18 @@ const readInternal = (text, offset = 0) => {
                     break;
                 }
                 else if (space(c)) {
-                    return result(parseFloat(currentform));
+                    if (currentform == '+' || currentform == '-') {
+                        return result(Symbol.for(currentform));
+                    } else if (currentform == '.') {
+                        return result(dot);
+                    } else {
+                        return result(parseFloat(currentform));
+                    }
+                }
+                else if (rxSymbol.test(c)) {
+                    currentform += c;
+                    state = "symbol";
+                    break;
                 }
                 else {
                     throw "unexpected character found while parsing number: " + c;
@@ -218,4 +250,4 @@ const readInternal = (text, offset = 0) => {
 
 
 
-module.exports = { read };
+module.exports = { read, readInternal, Pair };

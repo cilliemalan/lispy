@@ -1,4 +1,4 @@
-const { read } = require('./lispy');
+const { read, dot, Pair } = require('./lispy');
 const assert = require('assert');
 
 const tests = {
@@ -11,6 +11,19 @@ const tests = {
 
     'read reads a symbol': () => assert.strictEqual(read("hello"), Symbol.for('hello')),
     'read reads a symbol with leading spaces': () => assert.strictEqual(read("  helloA"), Symbol.for('helloA')),
+    'read reads a symbol with funny characters': () => assert.strictEqual(read("/?<>!$%^&*-=_+"), Symbol.for('/?<>!$%^&*-=_+')),
+    'read reads a symbol with number literals 1': () => assert.strictEqual(read("+one"), Symbol.for('+one')),
+    'read reads a symbol with number literals 2': () => assert.strictEqual(read("-a"), Symbol.for('-a')),
+    'read reads a symbol with number literals 3': () => assert.strictEqual(read("1.0f"), Symbol.for('1.0f')),
+    'read reads a symbol with number literals 4': () => assert.strictEqual(read("1.hello"), Symbol.for('1.hello')),
+    'read reads a symbol with number literals 4': () => assert.strictEqual(read("1.0hello"), Symbol.for('1.0hello')),
+    'read reads a symbol with number literals 5': () => assert.strictEqual(read("99balloons"), Symbol.for('99balloons')),
+    'read reads a symbol with other literals 1': () => assert.strictEqual(read(".five"), Symbol.for('.five')),
+    'read reads a symbol with other literals 2': () => assert.strictEqual(read("="), Symbol.for('=')),
+    'read reads a symbol with other literals 3': () => assert.strictEqual(read("!really?"), Symbol.for('!really?')),
+    'read reads a symbol with well known name 1': () => assert.strictEqual(read("string?"), Symbol.for('string?')),
+    'read reads a symbol with well known name 2': () => assert.strictEqual(read("string->num"), Symbol.for('string->num')),
+    'read reads a symbol with well known name 3': () => assert.strictEqual(read("+"), Symbol.for('+')),
 
     'read reads a string': () => assert.strictEqual(read('"hello"'), "hello"),
     'read reads a string with escapes': () => assert.strictEqual(read('"hello\\n"'), "hello\n"),
@@ -43,6 +56,11 @@ const tests = {
     'read supports quote with whitespace': () => assert.deepStrictEqual(read("' 1"), [Symbol.for('quote'), 1]),
     'read supports quote with more whitespace': () => assert.deepStrictEqual(read(" ( 1 '\n2  3 ) "), [1, [Symbol.for('quote'), 2], 3]),
     'read supports quote with even more whitespace': () => assert.deepStrictEqual(read(" ( 1 '\n(1 2)  3 ) "), [1, [Symbol.for('quote'), [1, 2]], 3]),
+
+    'read supports dot': () => assert.deepStrictEqual(read("(1 . 2)"), new Pair(1, 2)),
+    'read does not support improper dot 1':() => assert.throws(() => read("(1 . 2 3)")),
+    'read does not support improper dot 2':() => assert.throws(() => read("(1 2 . 3)")),
+    'read does not support improper dot 3':() => assert.throws(() => read(".")),
 }
 
 
