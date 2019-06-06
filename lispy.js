@@ -47,6 +47,19 @@ const readInternal = (text, offset = 0) => {
                     currentform += c;
                     break;
                 }
+                else if (c === '#') {
+                    state = "hash";
+                    currentform += c;
+                    break;
+                }
+                else if (c === '/') {
+                    state = "slash";
+                    break;
+                }
+                else if (c == ';') {
+                    state = "line comment";
+                    break;
+                }
                 else if (rxSpace.test(c)) {
                     break;
                 }
@@ -68,7 +81,7 @@ const readInternal = (text, offset = 0) => {
                             }
                         }
                         if (end(c2)) {
-                            if(!corresponding(c,c2)) {
+                            if (!corresponding(c, c2)) {
                                 throw `the opening tag ${c} does not correspond to the found closing tag ${c2}`;
                             }
                             i++;
@@ -117,7 +130,7 @@ const readInternal = (text, offset = 0) => {
                 }
                 break;
             case "string":
-                if (c == '"') {
+                if (c === '"') {
                     currentform += c;
                     let numslashes = 0;
                     for (let j = i - 1; j >= 0; j--) {
@@ -128,10 +141,84 @@ const readInternal = (text, offset = 0) => {
                         i++;
                         return result(JSON.parse(currentform))
                     }
+                    break;
                 } else if (c == "") {
                     throw "unexpected end of file while parsing string";
                 } else {
                     currentform += c;
+                    break;
+                }
+                break;
+            case "hash":
+                if (c == 't' || c == 'T') {
+                    return result(true);
+                } else if (c == 'f' || c == 'F') {
+                    return result(false);
+                } else if (c == '|') {
+                    state = "pipe comment";
+                    break;
+                } else {
+                    throw `unexpected character after #: ${c}`;
+                }
+                break;
+            case "slash":
+                if (c === '/') {
+                    state = "line comment";
+                    break;
+                }
+                else if (c === '*') {
+                    state = "comment";
+                    break;
+                } else {
+                    throw "unexpected content after forward slash";
+                }
+                break;
+            case "line comment":
+                if (c === '\n') {
+                    state = "form";
+                    break;
+                } else {
+                    break;
+                }
+                break;
+            case "comment":
+                if (c === '*') {
+                    state = "maybe comment end";
+                    break;
+                } else if (c === "") {
+                    throw "unexpected end of file inside comment";
+                } else {
+                    break;
+                }
+                break;
+            case "maybe comment end":
+                if (c === '/') {
+                    state = "form";
+                    break;
+                } else if (c === "") {
+                    throw "unexpected end of file inside comment";
+                } else {
+                    break;
+                }
+                break;
+            case "pipe comment":
+                if (c === '|') {
+                    state = "maybe pipe comment end";
+                    break;
+                } else if (c === "") {
+                    throw "unexpected end of file inside comment";
+                } else {
+                    break;
+                }
+                break;
+            case "maybe pipe comment end":
+                if (c === '#') {
+                    state = "form";
+                    break;
+                } else if (c === "") {
+                    throw "unexpected end of file inside comment";
+                } else {
+                    break;
                 }
                 break;
             default:
