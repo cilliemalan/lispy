@@ -6,8 +6,8 @@ const read = (text) => {
 
 const readInternal = (text, offset = 0) => {
     const len = text.length;
-    if (len == 0) len = text.length;
-    if (len == 0) return undefined;
+    if (len === 0) len = text.length;
+    if (len === 0) return undefined;
 
     const rxSpace = /\s/;
     const rxNumber = /[0-9.+-]/;
@@ -23,7 +23,7 @@ const readInternal = (text, offset = 0) => {
     const start = (c) => c === "(" || c === "[" || c === "{";
     const end = (c) => c === ")" || c === "]" || c === "}";
     const space = (c) => /\s/.test(c) || c === "" || end(c) || start(c);
-    const corresponding = (a, b) => a == '(' && b == ')' || a == '[' && b == ']' || a == '{' && b == '}';
+    const corresponding = (a, b) => a === '(' && b === ')' || a === '[' && b === ']' || a === '{' && b === '}';
 
     let state = "form";
     let currentform = "";
@@ -81,7 +81,6 @@ const readInternal = (text, offset = 0) => {
                     break;
                 }
                 else if (start(c)) {
-                    ///////
                     i++;
                     const res = [];
                     for (; ;) {
@@ -91,7 +90,7 @@ const readInternal = (text, offset = 0) => {
                         if (form) {
                             res.push(form);
                         } else {
-                            if (end(c2) && res.length == 0) {
+                            if (end(c2) && res.length === 0) {
                                 return result(null);
                             } else {
                                 throw "unexpected situation";
@@ -102,9 +101,9 @@ const readInternal = (text, offset = 0) => {
                                 throw `the opening tag ${c} does not correspond to the found closing tag ${c2}`;
                             }
                             i++;
-                            if (res.length == 0) throw "unexpected empty list";
+                            if (res.length === 0) throw "unexpected empty list";
                             else return result(res);
-                        } else if (c2 == "") {
+                        } else if (c2 === "") {
                             throw "unexpected eof while reading list";
                         }
                     }
@@ -154,12 +153,12 @@ const readInternal = (text, offset = 0) => {
                         if (text[j] === '\\') numslashes++;
                         else break;
                     }
-                    if (numslashes % 2 == 0) {
+                    if (numslashes % 2 === 0) {
                         i++;
                         return result(JSON.parse(currentform))
                     }
                     break;
-                } else if (c == "") {
+                } else if (c === "") {
                     throw "unexpected end of file while parsing string";
                 } else {
                     currentform += c;
@@ -167,11 +166,11 @@ const readInternal = (text, offset = 0) => {
                 }
                 break;
             case "hash":
-                if (c == 't' || c == 'T') {
+                if (c === 't' || c === 'T') {
                     return result(true);
-                } else if (c == 'f' || c == 'F') {
+                } else if (c === 'f' || c === 'F') {
                     return result(false);
-                } else if (c == '|') {
+                } else if (c === '|') {
                     state = "pipe comment";
                     break;
                 } else {
