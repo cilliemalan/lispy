@@ -71,6 +71,22 @@ const tests = {
     'read does not support improper dot 1': () => assert.throws(() => read("(1 . 2 3)")),
     'read does not support improper dot 2': () => assert.throws(() => read("(1 2 . 3)")),
     'read does not support improper dot 3': () => assert.throws(() => read(".")),
+
+
+    // evaluate tests
+    'evaluate evaulates a number': () => assert.strictEqual(evaluate(1), 1),
+    'evaluate evaulates a boolean 1': () => assert.strictEqual(evaluate(true), true),
+    'evaluate evaulates a boolean 2': () => assert.strictEqual(evaluate(false), false),
+    'evaluate evaulates a string': () => assert.strictEqual(evaluate("hello world"), "hello world"),
+    'evaluate evaluates a function': () => assert.strictEqual(Object.toString, Object.toString),
+    'evaluate does not evaluate null': () => assert.throws(() => evaluate(null)),
+    'evaluate does not evaluate undefined': () => assert.throws(() => evaluate(undefined)),
+    'evaluate does not evaluate nothing': () => assert.throws(() => evaluate()),
+    'evaluate does not evaluate a pair': () => assert.throws(() => evaluate(new Pair(1, 2))),
+
+    'evaluate looks up a symbol': () => assert.strictEqual(evaluate(Symbol.for('symbol'), (s) => { assert.strictEqual(s, Symbol.for('symbol')); return "value" }), "value"),
+    'evaluate invokes a function': () => assert.strictEqual(evaluate([Symbol.for('func')], () => () => "value"), "value"),
+    'evaluate runs a simple program': () => assert.strictEqual(evaluate([Symbol.for('+'), 1, 2], () => (a, b) => (a + b)), 3),
 }
 
 
