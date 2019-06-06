@@ -11,8 +11,7 @@ const readInternal = (text, offset = 0) => {
 
     const rxSpace = /\s/;
     const rxNumber = /[0-9.+-]/;
-    const rxSymbolStart = /[_$a-zA-Z\xA0-\uFFFF]/i;
-    const rxSymbolRest = /[_$a-zA-Z0-9\xA0-\uFFFF]/i;
+    const rxSymbol = /[-+*/!=$%^&_=?:~$a-zA-Z\xA0-\uFFFF]/i;
     const rxQuote = /['`,]/;
 
     let i = offset;
@@ -38,7 +37,7 @@ const readInternal = (text, offset = 0) => {
                     currentform += c;
                     break;
                 }
-                else if (rxSymbolStart.test(c)) {
+                else if (rxSymbol.test(c)) {
                     state = "symbol";
                     currentform += c;
                     break;
@@ -51,10 +50,6 @@ const readInternal = (text, offset = 0) => {
                 else if (c === '#') {
                     state = "hash";
                     currentform += c;
-                    break;
-                }
-                else if (c === '/') {
-                    state = "slash";
                     break;
                 }
                 else if (c === ';') {
@@ -134,7 +129,7 @@ const readInternal = (text, offset = 0) => {
                 }
                 break;
             case "symbol":
-                if (rxSymbolRest.test(c)) {
+                if (rxSymbol.test(c)) {
                     currentform += c;
                     break;
                 }
@@ -177,42 +172,10 @@ const readInternal = (text, offset = 0) => {
                     throw `unexpected character after #: ${c}`;
                 }
                 break;
-            case "slash":
-                if (c === '/') {
-                    state = "line comment";
-                    break;
-                }
-                else if (c === '*') {
-                    state = "comment";
-                    break;
-                } else {
-                    throw "unexpected content after forward slash";
-                }
-                break;
             case "line comment":
                 if (c === '\n') {
                     state = "form";
                     break;
-                } else {
-                    break;
-                }
-                break;
-            case "comment":
-                if (c === '*') {
-                    state = "maybe comment end";
-                    break;
-                } else if (c === "") {
-                    throw "unexpected end of file inside comment";
-                } else {
-                    break;
-                }
-                break;
-            case "maybe comment end":
-                if (c === '/') {
-                    state = "form";
-                    break;
-                } else if (c === "") {
-                    throw "unexpected end of file inside comment";
                 } else {
                     break;
                 }

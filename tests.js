@@ -33,8 +33,6 @@ const tests = {
     'read expects matching brackets': () => assert.throws(() => read('(1 2 3}'), /does not correspond/),
     'read reads multi line forms': () => assert.deepStrictEqual(read('(\n1\n(2 \n 3)\n\t 4 \n)'), [1, [2, 3], 4]),
 
-    'read supports slashes single line comments': () => assert.deepStrictEqual(read('(\n // this is a comment \n 1 (2 3) 4)'), [1, [2, 3], 4]),
-    'read supports slashes multi line comments': () => assert.deepStrictEqual(read('(\n /* this \n is \n a comment */ 1 (2 3) 4)'), [1, [2, 3], 4]),
     'read supports semicolon comments': () => assert.deepStrictEqual(read('(\n ; this is a comment \n 1 (2 3) 4)'), [1, [2, 3], 4]),
     'read supports pipe comments': () => assert.deepStrictEqual(read('(\n #| this \n is \n a comment |# 1 (2 3) 4)'), [1, [2, 3], 4]),
 
@@ -48,14 +46,21 @@ const tests = {
 }
 
 
+
+let tcnt = 0, tot = 0;
 Object.keys(tests).forEach(t => {
+    tot++;
     process.stdout.write(`${t}: `);
     try {
         tests[t]();
         process.stdout.write(`OK\n`);
+        tcnt++;
     } catch (e) {
         process.stdout.write(`FAIL\n`);
         if (e.message) console.error(e.message);
         else console.error(e);
     }
 });
+
+console.log(`Passed (${tcnt}/${tot})`);
+process.exitCode = tcnt === tot ? 0 : 1;
