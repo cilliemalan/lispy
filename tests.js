@@ -37,6 +37,14 @@ const tests = {
     'read supports slashes multi line comments': () => assert.deepStrictEqual(read('(\n /* this \n is \n a comment */ 1 (2 3) 4)'), [1, [2, 3], 4]),
     'read supports semicolon comments': () => assert.deepStrictEqual(read('(\n ; this is a comment \n 1 (2 3) 4)'), [1, [2, 3], 4]),
     'read supports pipe comments': () => assert.deepStrictEqual(read('(\n #| this \n is \n a comment |# 1 (2 3) 4)'), [1, [2, 3], 4]),
+
+    'read supports quote': () => assert.deepStrictEqual(read("'1"), [Symbol.for('quote'), 1]),
+    'read supports unquote': () => assert.deepStrictEqual(read(",1"), [Symbol.for('unquote'), 1]),
+    'read supports quasiquote': () => assert.deepStrictEqual(read("`1"), [Symbol.for('quasiquote'), 1]),
+    'read supports quote in the middle of stuff': () => assert.deepStrictEqual(read("(1 '2 3)"), [1, [Symbol.for('quote'), 2], 3]),
+    'read supports quote with whitespace': () => assert.deepStrictEqual(read("' 1"), [Symbol.for('quote'), 1]),
+    'read supports quote with more whitespace': () => assert.deepStrictEqual(read(" ( 1 '\n2  3 ) "), [1, [Symbol.for('quote'), 2], 3]),
+    'read supports quote with even more whitespace': () => assert.deepStrictEqual(read(" ( 1 '\n(1 2)  3 ) "), [1, [Symbol.for('quote'), [1, 2]], 3]),
 }
 
 

@@ -13,6 +13,7 @@ const readInternal = (text, offset = 0) => {
     const rxNumber = /[0-9.+-]/;
     const rxSymbolStart = /[_$a-zA-Z\xA0-\uFFFF]/i;
     const rxSymbolRest = /[_$a-zA-Z0-9\xA0-\uFFFF]/i;
+    const rxQuote = /['`,]/;
 
     let i = offset;
     const result = (r) => {
@@ -56,9 +57,25 @@ const readInternal = (text, offset = 0) => {
                     state = "slash";
                     break;
                 }
-                else if (c == ';') {
+                else if (c === ';') {
                     state = "line comment";
                     break;
+                }
+                else if (rxQuote.test(c)) {
+                    let quoteSym;
+                    switch (c) {
+                        case "'": quoteSym = Symbol.for('quote'); break;
+                        case "`": quoteSym = Symbol.for('quasiquote'); break;
+                        case ",": quoteSym = Symbol.for('unquote'); break;
+                    }
+                    i++;
+                    const [subform, advance] = readInternal(text, i);
+                    i += advance;
+                    if (subform === undefined) {
+                        throw "unexpected content after quote";
+                    } else {
+                        return result([quoteSym, subform]);
+                    }
                 }
                 else if (rxSpace.test(c)) {
                     break;
