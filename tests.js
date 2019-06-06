@@ -86,7 +86,11 @@ const tests = {
 
     'evaluate looks up a symbol': () => assert.strictEqual(evaluate(Symbol.for('symbol'), (s) => { assert.strictEqual(s, Symbol.for('symbol')); return "value" }), "value"),
     'evaluate invokes a function': () => assert.strictEqual(evaluate([Symbol.for('func')], () => () => "value"), "value"),
-    'evaluate runs a simple program': () => assert.strictEqual(evaluate([Symbol.for('+'), 1, 2], () => (a, b) => (a + b)), 3),
+    'evaluate evaluates arguments': () => evaluate([Symbol.for('func'), Symbol.for('a')], (p) => p == Symbol.for('a') ? "a" : (f) => assert.strictEqual(f, "a")),
+    'evaluate runs a simple program': () => assert.strictEqual(evaluate([Symbol.for('+'), 7, [Symbol.for('+'), 1, 2]], () => (a, b) => (a + b)), 10),
+
+
+    // prelude tests
 }
 
 
