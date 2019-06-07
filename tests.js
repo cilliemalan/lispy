@@ -86,10 +86,7 @@ const tests = {
 
     'evaluateLight looks up a symbol': () => assert.strictEqual(evaluateLight(Symbol.for('symbol'), (s) => { assert.strictEqual(s, Symbol.for('symbol')); return "value" }), "value"),
     'evaluateLight invokes a function': () => assert.strictEqual(evaluateLight([Symbol.for('func')], () => () => "value"), "value"),
-    'evaluateLight does not evaluate arguments': () => evaluateLight([Symbol.for('func'), Symbol.for('a')], (p) => p == Symbol.for('a') ? "a" : (f) => assert.strictEqual(f, Symbol.for('a'))),
-
-
-    // prelude tests
+    'evaluateLight does evaluate arguments': () => evaluateLight([Symbol.for('func'), Symbol.for('a')], (p) => p == Symbol.for('a') ? "a" : (f) => assert.strictEqual(f, "a")),
 }
 
 

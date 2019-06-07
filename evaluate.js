@@ -12,7 +12,7 @@ const evaluateLight = (expression, environment) => {
     else if (isArray(expression)) {
         var func = evaluateLight(expression[0], environment);
         if (!isFunction(func)) throw `cannot invoke non-function: ${func}`;
-        return func.apply(null, expression.slice(1));
+        return func.apply(null, expression.slice(1).map(x => evaluateLight(x, environment)));
     } else if (isSymbol(expression)) {
         return environment(expression);
     } else {
