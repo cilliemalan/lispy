@@ -1,6 +1,7 @@
 const { read, dot, Pair } = require('./reader');
+const { Macro } = require('./types');
 const assert = require('assert');
-const { evaluateLight } = require('./evaluate');
+const { evaluate } = require('./evaluate');
 
 const tests = {
 
@@ -73,20 +74,21 @@ const tests = {
     'read does not support improper dot 3': () => assert.throws(() => read(".")),
 
 
-    // evaluateLight tests
-    'evaluateLight evaulates a number': () => assert.strictEqual(evaluateLight(1), 1),
-    'evaluateLight evaulates a boolean 1': () => assert.strictEqual(evaluateLight(true), true),
-    'evaluateLight evaulates a boolean 2': () => assert.strictEqual(evaluateLight(false), false),
-    'evaluateLight evaulates a string': () => assert.strictEqual(evaluateLight("hello world"), "hello world"),
-    'evaluateLight evaluates a function': () => assert.strictEqual(Object.toString, Object.toString),
-    'evaluateLight does not evaluate null': () => assert.throws(() => evaluateLight(null)),
-    'evaluateLight does not evaluate undefined': () => assert.throws(() => evaluateLight(undefined)),
-    'evaluateLight does not evaluate nothing': () => assert.throws(() => evaluateLight()),
-    'evaluateLight does not evaluate a pair': () => assert.throws(() => evaluateLight(new Pair(1, 2))),
+    // evaluate tests
+    'evaluate evaulates a number': () => assert.strictEqual(evaluate(1), 1),
+    'evaluate evaulates a boolean 1': () => assert.strictEqual(evaluate(true), true),
+    'evaluate evaulates a boolean 2': () => assert.strictEqual(evaluate(false), false),
+    'evaluate evaulates a string': () => assert.strictEqual(evaluate("hello world"), "hello world"),
+    'evaluate evaluates a function': () => assert.strictEqual(Object.toString, Object.toString),
+    'evaluate does not evaluate null': () => assert.throws(() => evaluate(null)),
+    'evaluate does not evaluate undefined': () => assert.throws(() => evaluate(undefined)),
+    'evaluate does not evaluate nothing': () => assert.throws(() => evaluate()),
+    'evaluate does not evaluate a pair': () => assert.throws(() => evaluate(new Pair(1, 2))),
 
-    'evaluateLight looks up a symbol': () => assert.strictEqual(evaluateLight(Symbol.for('symbol'), (s) => { assert.strictEqual(s, Symbol.for('symbol')); return "value" }), "value"),
-    'evaluateLight invokes a function': () => assert.strictEqual(evaluateLight([Symbol.for('func')], () => () => "value"), "value"),
-    'evaluateLight does evaluate arguments': () => evaluateLight([Symbol.for('func'), Symbol.for('a')], (p) => p == Symbol.for('a') ? "a" : (f) => assert.strictEqual(f, "a")),
+    'evaluate looks up a symbol': () => assert.strictEqual(evaluate(Symbol.for('symbol'), (s) => { assert.strictEqual(s, Symbol.for('symbol')); return "value" }), "value"),
+    'evaluate invokes a function': () => assert.strictEqual(evaluate([Symbol.for('func')], () => () => "value"), "value"),
+    'evaluate does evaluate arguments': () => evaluate([Symbol.for('func'), Symbol.for('a')], (p) => p == Symbol.for('a') ? "a" : (f) => assert.strictEqual(f, "a")),
+    'evaluate does not evaluate arguments for a macro': () => evaluate([Symbol.for('func'), Symbol.for('a')], (p) => p == Symbol.for('a') ? "a" : new Macro((f) => assert.strictEqual(f, Symbol.for("a")))),
 }
 
 
