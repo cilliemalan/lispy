@@ -1,9 +1,8 @@
 const util = require('util');
+const { Pair } = require('./types');
 
-class Pair {
-    constructor(a,b) { this.a = a; this.b = b; }
-}
-
+// dot is special and we track it but it will never be returned
+// by read
 const dot = Symbol('.');
 
 const read = (text) => {
