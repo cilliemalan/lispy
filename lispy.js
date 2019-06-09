@@ -1,9 +1,8 @@
-#!node
+#!/usr/bin/env node
 
-const { isArray, isNumber, isBoolean, isString, isSymbol, isNull, isFunction } = require('util');
 const { readFileSync } = require('fs');
 const { evaluate } = require('./evaluate');
-const { readInternal, Pair } = require('./reader');
+const { read } = require('./reader');
 const { createPrelude } = require('./prelude');
 
 
@@ -27,7 +26,7 @@ const evaluate = (program) => evaluate(program, environmentLookup);
 
 const runCommand = (command) => {
     for (var ix = 0; ix < command.length;) {
-        const [program, advance] = readInternal(command, ix);
+        const [program, advance] = read(command, ix);
         ix += advance;
         if (program !== undefined) {
             evaluate(program);

@@ -5,10 +5,10 @@ const { Pair } = require('./types');
 // by read
 const dot = Symbol('.');
 
-const read = (text) => {
-    const [r, _] = readInternal(text);
-    if(r === dot) throw "unexpected .";
-    return r;
+const read = (text, offset = 0) => {
+    const [r, a] = readInternal(text, offset);
+    if (r === dot) throw "unexpected dot";
+    return [r, a];
 }
 
 const readInternal = (text, offset = 0) => {
@@ -258,4 +258,4 @@ const readInternal = (text, offset = 0) => {
 
 
 
-module.exports = { read, readInternal, Pair };
+module.exports = { read, Pair };

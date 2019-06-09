@@ -11,9 +11,6 @@ const evaluate = (expression, environment) => {
         if (isFunction(func)) {
             return func.apply(null, expression.slice(1).map(x => evaluate(x, environment)));
         }
-        else if (func instanceof Macro) {
-            return func.invoke.apply(null, expression.slice(1));
-        }
         else {
             throw `cannot invoke non-function: ${func}`;
         }
