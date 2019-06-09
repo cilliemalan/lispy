@@ -6,12 +6,22 @@ const evaluate = (expression, environment) => {
     else if (isString(expression)) return expression;
     else if (isSymbol(expression)) return environment(expression);
     else if (isArray(expression)) {
-        var func = evaluate(expression[0], environment);
-        if (isFunction(func)) {
-            return func.apply(null, expression.slice(1).map(x => evaluate(x, environment)));
-        }
-        else {
-            throw `cannot invoke non-function: ${func}`;
+        var [rator, ...rand] = expression;
+        if (rator === Symbol.for('and')) {
+
+        } else if (rator === Symbol.for('or')) {
+
+        } else if (rator === Symbol.for('lambda')) {
+
+        } else {
+            var func = evaluate(rator, environment);
+
+            if (isFunction(func)) {
+                var args = rand.map(r => evaluate(r, environment));
+                return func.apply(null, args);
+            } else {
+                throw `cannot invoke non-function: ${rator}`;
+            }
         }
     }
     else {
