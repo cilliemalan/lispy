@@ -1,4 +1,3 @@
-const { Macro } = require('./types');
 const { isArray, isSymbol, isString, isBoolean, isNumber } = require('util');
 
 module.exports = {
@@ -30,23 +29,6 @@ module.exports = {
                     }
                 })
         };
-        prelude[s('and')] = new Macro((...expressions) => {
-            for (e in expressions) {
-                if (evaluate(e) === false) return false;
-            }
-            return true;
-        });
-        prelude[s('or')] = new Macro((...expressions) => {
-            for (e in expressions) {
-                if (evaluate(e) !== false) return true;
-            }
-            return false;
-        });
-        prelude[s('if')] = new Macro((i, t, e) => evaluate(i) !== false
-            ? evaluate(t)
-            : (e !== null
-                ? evaluate(e)
-                : null));
 
         return prelude;
     }

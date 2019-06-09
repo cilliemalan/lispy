@@ -1,5 +1,4 @@
 const { isArray, isNumber, isBoolean, isString, isSymbol, isFunction } = require('util');
-const { Macro } = require('./types');
 
 const evaluate = (expression, environment) => {
     if (isNumber(expression)) return expression;
