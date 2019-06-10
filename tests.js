@@ -92,6 +92,15 @@ const tests = {
     'evaluate does not evaluate nothing': () => assert.throws(() => evaluate()),
     'evaluate does not evaluate a pair': () => assert.throws(() => evaluate(new Pair(1, 2))),
 
+    'evaluate evaluates and to true': () => assert.strictEqual(evaluate([Symbol.for('and')]), true),
+    'evaluate evaluates and and it\'s paramters': () => assert.strictEqual(evaluate([Symbol.for('and'), 5, 6, 7]), true),
+    'evaluate evaluates and to false if there is a false': () => assert.strictEqual(evaluate([Symbol.for('and'), 5, 6, false]), false),
+
+    'evaluate evaluates or to false': () => assert.strictEqual(evaluate([Symbol.for('or')]), false),
+    'evaluate evaluates or and it\'s paramters': () => assert.strictEqual(evaluate([Symbol.for('or'), 5, 6, 7]), true),
+    'evaluate evaluates or to false if all is false': () => assert.strictEqual(evaluate([Symbol.for('or'), false, false, false]), false),
+    'evaluate evaluates or to true if one is true': () => assert.strictEqual(evaluate([Symbol.for('or'), false, true, false]), true),
+
     'evaluate looks up a symbol': () => assert.strictEqual(evaluate(Symbol.for('symbol'), (s) => { assert.strictEqual(s, Symbol.for('symbol')); return "value" }), "value"),
     'evaluate invokes a function': () => assert.strictEqual(evaluate([Symbol.for('func')], () => () => "value"), "value"),
     'evaluate does evaluate arguments': () => evaluate([Symbol.for('func'), Symbol.for('a')], (p) => p == Symbol.for('a') ? "a" : (f) => assert.strictEqual(f, "a")),
