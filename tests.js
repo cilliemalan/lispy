@@ -1,5 +1,4 @@
 const { read } = require('./reader');
-const { Pair } = require('./types');
 const assert = require('assert');
 const { evaluate } = require('./evaluate');
 
@@ -72,10 +71,7 @@ const tests = {
     'read supports quote with more whitespace': () => assert.deepStrictEqual(readSimple(" ( 1 '\n2  3 ) "), [1, [Symbol.for('quote'), 2], 3]),
     'read supports quote with even more whitespace': () => assert.deepStrictEqual(readSimple(" ( 1 '\n(1 2)  3 ) "), [1, [Symbol.for('quote'), [1, 2]], 3]),
 
-    'read supports dot': () => assert.deepStrictEqual(readSimple("(1 . 2)"), new Pair(1, 2)),
-    'read turns dotted pair into list if possible 1': () => assert.deepStrictEqual(readSimple("(1 . (2 3))"), [1, 2, 3]),
-    'read turns dotted pair into list if possible 2': () => assert.deepStrictEqual(readSimple("((1) . (2 3))"), [[1], 2, 3]),
-    'read turns dotted pair into list if possible 3': () => assert.deepStrictEqual(readSimple("(1 . ())"), [1]),
+    'read does not support dot': () => assert.throws(() => readSimple("(1 . 2)")),
     'read does not support improper dot 1': () => assert.throws(() => readSimple("(1 . 2 3)")),
     'read does not support improper dot 2': () => assert.throws(() => readSimple("(1 2 . 3)")),
     'read does not support improper dot 3': () => assert.throws(() => readSimple(".")),

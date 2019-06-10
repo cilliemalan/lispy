@@ -1,17 +1,6 @@
 const util = require('util');
-const { Pair } = require('./types');
-
-// dot is special and we track it but it will never be returned
-// by read
-const dot = Symbol('.');
 
 const read = (text, offset = 0) => {
-    const [r, a] = readInternal(text, offset);
-    if (r === dot) throw "unexpected dot";
-    return [r, a];
-}
-
-const readInternal = (text, offset = 0) => {
     const len = text.length;
     if (len === 0) len = text.length;
     if (len === 0) return undefined;
@@ -24,27 +13,6 @@ const readInternal = (text, offset = 0) => {
     let i = offset;
     const result = (r) => {
         while (rxSpace.test(text[i])) i++;
-
-        if(util.isArray(r)) {
-            // check for dots
-            if(r.filter(x => x === dot).length != 0) {
-                // there is a dot somewhere
-                const [a, d, b] = r;
-                if(r.length === 3 && a !== dot && d === dot && b !== dot) {
-                    // (x . (...)) -> (x ...)
-                    if(util.isArray(b)) {
-                        r = [a, ...b];
-                    } else if (b === null) {
-                        r = [a];
-                    } else {
-                        r = new Pair(a, b);
-                    }
-                } else {
-                    throw "unexpected dot";
-                }
-            }
-        }
-
         return [r, i - offset];
     }
     const start = (c) => c === "(" || c === "[" || c === "{";
@@ -92,7 +60,7 @@ const readInternal = (text, offset = 0) => {
                         case ",": quoteSym = Symbol.for('unquote'); break;
                     }
                     i++;
-                    const [subform, advance] = readInternal(text, i);
+                    const [subform, advance] = read(text, i);
                     i += advance;
                     if (subform === undefined) {
                         throw "unexpected content after quote";
@@ -107,7 +75,7 @@ const readInternal = (text, offset = 0) => {
                     i++;
                     const res = [];
                     for (; ;) {
-                        const [form, advance] = readInternal(text, i);
+                        const [form, advance] = read(text, i);
                         i += advance;
                         const c2 = i < len ? text[i] : "";
                         if (form !== undefined) {
@@ -154,7 +122,7 @@ const readInternal = (text, offset = 0) => {
                     if (currentform == '+' || currentform == '-') {
                         return result(Symbol.for(currentform));
                     } else if (currentform == '.') {
-                        return result(dot);
+                        throw "a solitary dot is not valid syntax";
                     } else {
                         return result(parseFloat(currentform));
                     }
@@ -258,4 +226,4 @@ const readInternal = (text, offset = 0) => {
 
 
 
-module.exports = { read, Pair };
+module.exports = { read };
