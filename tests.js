@@ -72,9 +72,9 @@ const tests = {
     'read supports quote with even more whitespace': () => assert.deepStrictEqual(readSimple(" ( 1 '\n(1 2)  3 ) "), [1, [Symbol.for('quote'), [1, 2]], 3]),
 
     'read does not support dot': () => assert.throws(() => readSimple("(1 . 2)")),
-    'read does not support improper dot 1': () => assert.throws(() => readSimple("(1 . 2 3)")),
-    'read does not support improper dot 2': () => assert.throws(() => readSimple("(1 2 . 3)")),
-    'read does not support improper dot 3': () => assert.throws(() => readSimple(".")),
+    'read does not support dot 1': () => assert.throws(() => readSimple("(1 . 2 3)")),
+    'read does not support dot 2': () => assert.throws(() => readSimple("(1 2 . 3)")),
+    'read does not support dot 3': () => assert.throws(() => readSimple(".")),
 
 
     // evaluate tests
