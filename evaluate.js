@@ -39,9 +39,7 @@ const evaluateInvocation = (expression, environment) => {
                     ? arguments[argumentIndexMap.get(s)]
                     : environment(s);
                 let result;
-                for (body in bodies) {
-                    result = evaluate(body, newEnvironment);
-                }
+                bodies.forEach(body => result = evaluate(body, newEnvironment));
                 return result;
             }
             break;
