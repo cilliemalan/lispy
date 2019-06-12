@@ -1,6 +1,7 @@
 const { read } = require('./reader');
 const assert = require('assert');
 const { evaluate } = require('./evaluate');
+const { isFunction } = require('util');
 
 const readSimple = (text) => {
     const [r, _] = read(text);
@@ -95,11 +96,68 @@ const tests = {
     'evaluate evaluates and to true': () => assert.strictEqual(evaluate([Symbol.for('and')]), true),
     'evaluate evaluates and and it\'s paramters': () => assert.strictEqual(evaluate([Symbol.for('and'), 5, 6, 7]), true),
     'evaluate evaluates and to false if there is a false': () => assert.strictEqual(evaluate([Symbol.for('and'), 5, 6, false]), false),
+    'evaluate evaluates and lazily': () => {
+        let call_a = 0;
+        let call_b = 0;
+        let call_c = 0;
+        const a = () => { call_a++; return true; }
+        const b = () => { call_b++; return false; }
+        const c = () => { call_c++; return false; }
+        const env = (s) => eval(s.description);
+        evaluate([Symbol.for('and'), [Symbol.for('a')], [Symbol.for('b')], [Symbol.for('c')]], env);
+        assert.equal(call_a, 1);
+        assert.equal(call_b, 1);
+        assert.equal(call_c, 0);
+    },
 
     'evaluate evaluates or to false': () => assert.strictEqual(evaluate([Symbol.for('or')]), false),
     'evaluate evaluates or and it\'s paramters': () => assert.strictEqual(evaluate([Symbol.for('or'), 5, 6, 7]), true),
     'evaluate evaluates or to false if all is false': () => assert.strictEqual(evaluate([Symbol.for('or'), false, false, false]), false),
     'evaluate evaluates or to true if one is true': () => assert.strictEqual(evaluate([Symbol.for('or'), false, true, false]), true),
+    'evaluate evaluates or lazily': () => {
+        let call_a = 0;
+        let call_b = 0;
+        let call_c = 0;
+        const a = () => { call_a++; return false; }
+        const b = () => { call_b++; return true; }
+        const c = () => { call_c++; return true; }
+        const env = (s) => eval(s.description);
+        evaluate([Symbol.for('or'), [Symbol.for('a')], [Symbol.for('b')], [Symbol.for('c')]], env);
+        assert.equal(call_a, 1);
+        assert.equal(call_b, 1);
+        assert.equal(call_c, 0);
+    },
+
+    'evaluate evaluates if true leg': () => assert.strictEqual(evaluate([Symbol.for('if'), true, 1, 2]), 1),
+    'evaluate evaluates if false leg': () => assert.strictEqual(evaluate([Symbol.for('if'), false, 1, 2]), 2),
+    'evaluate evaluates if true leg one legged': () => assert.strictEqual(evaluate([Symbol.for('if'), true, 1]), 1),
+    'evaluate evaluates if false leg one legged': () => assert.strictEqual(evaluate([Symbol.for('if'), false, 1]), undefined),
+    'evaluate evaluates if true leg and not other leg': () => {
+        let call_a = 0;
+        let call_b = 0;
+        const a = () => { call_a++; return 1; }
+        const b = () => { call_b++; return 2; }
+        const env = (s) => eval(s.description);
+        evaluate([Symbol.for('if'), true, [Symbol.for('a')], [Symbol.for('b')]], env);
+        assert.equal(call_a, 1);
+        assert.equal(call_b, 0);
+    },
+    'evaluate evaluates if false leg and not other leg': () => {
+        let call_a = 0;
+        let call_b = 0;
+        const a = () => { call_a++; return 1; }
+        const b = () => { call_b++; return 2; }
+        const env = (s) => eval(s.description);
+        evaluate([Symbol.for('if'), false, [Symbol.for('a')], [Symbol.for('b')]], env);
+        assert.equal(call_a, 0);
+        assert.equal(call_b, 1);
+    },
+
+    'evaluate evaluates lambda to a function': () => assert.equal(true, isFunction(evaluate([Symbol.for('lambda'), [], 1]))),
+    'evaluate evaluates lambda to a function that works': () => assert.strictEqual(evaluate([Symbol.for('lambda'), [], 1])(), 1),
+    'evaluate can evaluate a lambda': () => assert.strictEqual(evaluate([[Symbol.for('lambda'), [], 1]]), 1),
+    'evaluate evaluates lambda to a function that takes an arg': () => assert.strictEqual(evaluate([Symbol.for('lambda'), [Symbol.for('a')], Symbol.for('a')])(33), 33),
+    'evaluate evaluates lambda to a function that takes args': () => assert.strictEqual(evaluate([Symbol.for('lambda'), [Symbol.for('a'), Symbol.for('b')], Symbol.for('b')])(33, 34), 34),
 }
 
 
