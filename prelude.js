@@ -17,18 +17,6 @@ module.exports = {
         prelude[s('*')] = (...args) => { let a = 1; args.forEach(i => a *= i); return a; };
         prelude[s('-')] = (...args) => { let a = args[0]; args.slice(1).forEach(i => a -= i); return a; };
         prelude[s('/')] = (...args) => { let a = args[0]; args.slice(1).forEach(i => a /= i); return a; };
-        prelude[s('lambda')] = (arguments, body) => {
-            return (...args) =>
-                eval(body, a => {
-                    var ix = arguments.indexOf(a);
-                    if (ix >= 0) {
-                        return args[ix];
-                    }
-                    else {
-                        return environmentLookup(a);
-                    }
-                })
-        };
 
         return prelude;
     }
