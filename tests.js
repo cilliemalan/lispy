@@ -3,6 +3,8 @@ const assert = require('assert');
 const { evaluate } = require('./evaluate');
 const { isFunction } = require('util');
 
+const s = (x) => Symbol.for(x);
+
 const readSimple = (text) => {
     const [r, _] = read(text);
     return r;
@@ -18,23 +20,23 @@ const tests = {
     'read parses a positive simple number': () => assert.strictEqual(readSimple("+123"), +123),
     'read ignores leading spaces': () => assert.strictEqual(readSimple("  123"), 123),
 
-    'read reads a symbol': () => assert.strictEqual(readSimple("hello"), Symbol.for('hello')),
-    'read reads a symbol with leading spaces': () => assert.strictEqual(readSimple("  helloA"), Symbol.for('helloA')),
-    'read reads a symbol with funny characters': () => assert.strictEqual(readSimple("/?<>!$%^&*-=_+"), Symbol.for('/?<>!$%^&*-=_+')),
-    'read reads a symbol with number literals 1': () => assert.strictEqual(readSimple("+one"), Symbol.for('+one')),
-    'read reads a symbol with number literals 2': () => assert.strictEqual(readSimple("-a"), Symbol.for('-a')),
-    'read reads a symbol with number literals 3': () => assert.strictEqual(readSimple("1.0f"), Symbol.for('1.0f')),
-    'read reads a symbol with number literals 4': () => assert.strictEqual(readSimple("1.hello"), Symbol.for('1.hello')),
-    'read reads a symbol with number literals 4': () => assert.strictEqual(readSimple("1.0hello"), Symbol.for('1.0hello')),
-    'read reads a symbol with number literals 5': () => assert.strictEqual(readSimple("99balloons"), Symbol.for('99balloons')),
-    'read reads a symbol with number literals 6': () => assert.strictEqual(readSimple("..."), Symbol.for('...')),
-    'read reads a symbol with other literals 1': () => assert.strictEqual(readSimple(".five"), Symbol.for('.five')),
-    'read reads a symbol with other literals 2': () => assert.strictEqual(readSimple("="), Symbol.for('=')),
-    'read reads a symbol with other literals 3': () => assert.strictEqual(readSimple("!really?"), Symbol.for('!really?')),
-    'read reads a symbol with other literals 4': () => assert.strictEqual(readSimple("_"), Symbol.for('_')),
-    'read reads a symbol with well known name 1': () => assert.strictEqual(readSimple("string?"), Symbol.for('string?')),
-    'read reads a symbol with well known name 2': () => assert.strictEqual(readSimple("string->num"), Symbol.for('string->num')),
-    'read reads a symbol with well known name 3': () => assert.strictEqual(readSimple("+"), Symbol.for('+')),
+    'read reads a symbol': () => assert.strictEqual(readSimple("hello"), s('hello')),
+    'read reads a symbol with leading spaces': () => assert.strictEqual(readSimple("  helloA"), s('helloA')),
+    'read reads a symbol with funny characters': () => assert.strictEqual(readSimple("/?<>!$%^&*-=_+"), s('/?<>!$%^&*-=_+')),
+    'read reads a symbol with number literals 1': () => assert.strictEqual(readSimple("+one"), s('+one')),
+    'read reads a symbol with number literals 2': () => assert.strictEqual(readSimple("-a"), s('-a')),
+    'read reads a symbol with number literals 3': () => assert.strictEqual(readSimple("1.0f"), s('1.0f')),
+    'read reads a symbol with number literals 4': () => assert.strictEqual(readSimple("1.hello"), s('1.hello')),
+    'read reads a symbol with number literals 4': () => assert.strictEqual(readSimple("1.0hello"), s('1.0hello')),
+    'read reads a symbol with number literals 5': () => assert.strictEqual(readSimple("99balloons"), s('99balloons')),
+    'read reads a symbol with number literals 6': () => assert.strictEqual(readSimple("..."), s('...')),
+    'read reads a symbol with other literals 1': () => assert.strictEqual(readSimple(".five"), s('.five')),
+    'read reads a symbol with other literals 2': () => assert.strictEqual(readSimple("="), s('=')),
+    'read reads a symbol with other literals 3': () => assert.strictEqual(readSimple("!really?"), s('!really?')),
+    'read reads a symbol with other literals 4': () => assert.strictEqual(readSimple("_"), s('_')),
+    'read reads a symbol with well known name 1': () => assert.strictEqual(readSimple("string?"), s('string?')),
+    'read reads a symbol with well known name 2': () => assert.strictEqual(readSimple("string->num"), s('string->num')),
+    'read reads a symbol with well known name 3': () => assert.strictEqual(readSimple("+"), s('+')),
 
     'read reads a string': () => assert.strictEqual(readSimple('"hello"'), "hello"),
     'read reads a string with escapes': () => assert.strictEqual(readSimple('"hello\\n"'), "hello\n"),
@@ -44,7 +46,7 @@ const tests = {
 
     'read reads a list with strings': () => assert.deepStrictEqual(readSimple('("a" "b" "c")'), ["a", "b", "c"]),
     'read reads a list numbers': () => assert.deepStrictEqual(readSimple('(1 2 3)'), [1, 2, 3]),
-    'read reads a list symbols': () => assert.deepStrictEqual(readSimple('(a b c)'), [Symbol.for('a'), Symbol.for('b'), Symbol.for('c')]),
+    'read reads a list symbols': () => assert.deepStrictEqual(readSimple('(a b c)'), [s('a'), s('b'), s('c')]),
     'read reads a list numbers and spaces': () => assert.deepStrictEqual(readSimple('( 1 \t 2 \n 3 )'), [1, 2, 3]),
     'read reads a list numbers and more spaces': () => assert.deepStrictEqual(readSimple(' ( 1 \t 2 \n 3 )\t'), [1, 2, 3]),
     'read reads a list with one number': () => assert.deepStrictEqual(readSimple('(1)'), [1]),
@@ -56,7 +58,7 @@ const tests = {
     'read reads empty list as null inside other list 4': () => assert.deepStrictEqual(readSimple('(1 ((())) () 3) '), [1, [[null]], null, 3]),
     'read reads nested lists': () => assert.deepStrictEqual(readSimple('(1 (2 3) 4)'), [1, [2, 3], 4]),
     'read reads nested lists without spaces': () => assert.deepStrictEqual(readSimple('(1(2 3)4)'), [1, [2, 3], 4]),
-    'read reads nested lists with symbols without spaces': () => assert.deepStrictEqual(readSimple('(a(b c)d)'), [Symbol.for('a'), [Symbol.for('b'), Symbol.for('c')], Symbol.for('d')]),
+    'read reads nested lists with symbols without spaces': () => assert.deepStrictEqual(readSimple('(a(b c)d)'), [s('a'), [s('b'), s('c')], s('d')]),
     'read reads nested lists with different brackets': () => assert.deepStrictEqual(readSimple('(1 [2 {3}] 4)'), [1, [2, [3]], 4]),
     'read expects matching brackets': () => assert.throws(() => readSimple('(1 2 3}'), /does not correspond/),
     'read reads multi line forms': () => assert.deepStrictEqual(readSimple('(\n1\n(2 \n 3)\n\t 4 \n)'), [1, [2, 3], 4]),
@@ -64,13 +66,13 @@ const tests = {
     'read supports semicolon comments': () => assert.deepStrictEqual(readSimple('(\n ; this is a comment \n 1 (2 3) 4)'), [1, [2, 3], 4]),
     'read supports pipe comments': () => assert.deepStrictEqual(readSimple('(\n #| this \n is \n a comment |# 1 (2 3) 4)'), [1, [2, 3], 4]),
 
-    'read supports quote': () => assert.deepStrictEqual(readSimple("'1"), [Symbol.for('quote'), 1]),
-    'read supports unquote': () => assert.deepStrictEqual(readSimple(",1"), [Symbol.for('unquote'), 1]),
-    'read supports quasiquote': () => assert.deepStrictEqual(readSimple("`1"), [Symbol.for('quasiquote'), 1]),
-    'read supports quote in the middle of stuff': () => assert.deepStrictEqual(readSimple("(1 '2 3)"), [1, [Symbol.for('quote'), 2], 3]),
-    'read supports quote with whitespace': () => assert.deepStrictEqual(readSimple("' 1"), [Symbol.for('quote'), 1]),
-    'read supports quote with more whitespace': () => assert.deepStrictEqual(readSimple(" ( 1 '\n2  3 ) "), [1, [Symbol.for('quote'), 2], 3]),
-    'read supports quote with even more whitespace': () => assert.deepStrictEqual(readSimple(" ( 1 '\n(1 2)  3 ) "), [1, [Symbol.for('quote'), [1, 2]], 3]),
+    'read supports quote': () => assert.deepStrictEqual(readSimple("'1"), [s('quote'), 1]),
+    'read supports unquote': () => assert.deepStrictEqual(readSimple(",1"), [s('unquote'), 1]),
+    'read supports quasiquote': () => assert.deepStrictEqual(readSimple("`1"), [s('quasiquote'), 1]),
+    'read supports quote in the middle of stuff': () => assert.deepStrictEqual(readSimple("(1 '2 3)"), [1, [s('quote'), 2], 3]),
+    'read supports quote with whitespace': () => assert.deepStrictEqual(readSimple("' 1"), [s('quote'), 1]),
+    'read supports quote with more whitespace': () => assert.deepStrictEqual(readSimple(" ( 1 '\n2  3 ) "), [1, [s('quote'), 2], 3]),
+    'read supports quote with even more whitespace': () => assert.deepStrictEqual(readSimple(" ( 1 '\n(1 2)  3 ) "), [1, [s('quote'), [1, 2]], 3]),
 
     'read does not support dot': () => assert.throws(() => readSimple("(1 . 2)")),
     'read does not support dot 1': () => assert.throws(() => readSimple("(1 . 2 3)")),
@@ -85,13 +87,13 @@ const tests = {
     'evaluate evaulates a string': () => assert.strictEqual(evaluate("hello world"), "hello world"),
     'evaluate evaluates a function': () => assert.strictEqual(Object.toString, Object.toString),
 
-    'evaluate looks up a symbol': () => assert.strictEqual(evaluate(Symbol.for('symbol'), (s) => { assert.strictEqual(s, Symbol.for('symbol')); return "value" }), "value"),
-    'evaluate invokes a function': () => assert.strictEqual(evaluate([Symbol.for('func')], () => () => "value"), "value"),
-    'evaluate does evaluate arguments': () => evaluate([Symbol.for('func'), Symbol.for('a')], (p) => p == Symbol.for('a') ? "a" : (f) => assert.strictEqual(f, "a")),
+    'evaluate looks up a symbol': () => assert.strictEqual(evaluate(s('symbol'), (z) => { assert.strictEqual(z, s('symbol')); return "value" }), "value"),
+    'evaluate invokes a function': () => assert.strictEqual(evaluate([s('func')], () => () => "value"), "value"),
+    'evaluate does evaluate arguments': () => evaluate([s('func'), s('a')], (p) => p == s('a') ? "a" : (f) => assert.strictEqual(f, "a")),
 
-    'evaluate evaluates and to true': () => assert.strictEqual(evaluate([Symbol.for('and')]), true),
-    'evaluate evaluates and and it\'s paramters': () => assert.strictEqual(evaluate([Symbol.for('and'), 5, 6, 7]), true),
-    'evaluate evaluates and to false if there is a false': () => assert.strictEqual(evaluate([Symbol.for('and'), 5, 6, false]), false),
+    'evaluate evaluates and to true': () => assert.strictEqual(evaluate([s('and')]), true),
+    'evaluate evaluates and and it\'s paramters': () => assert.strictEqual(evaluate([s('and'), 5, 6, 7]), true),
+    'evaluate evaluates and to false if there is a false': () => assert.strictEqual(evaluate([s('and'), 5, 6, false]), false),
     'evaluate evaluates and lazily': () => {
         let call_a = 0;
         let call_b = 0;
@@ -100,16 +102,16 @@ const tests = {
         const b = () => { call_b++; return false; }
         const c = () => { call_c++; return false; }
         const env = (s) => eval(s.description);
-        evaluate([Symbol.for('and'), [Symbol.for('a')], [Symbol.for('b')], [Symbol.for('c')]], env);
+        evaluate([s('and'), [s('a')], [s('b')], [s('c')]], env);
         assert.equal(call_a, 1);
         assert.equal(call_b, 1);
         assert.equal(call_c, 0);
     },
 
-    'evaluate evaluates or to false': () => assert.strictEqual(evaluate([Symbol.for('or')]), false),
-    'evaluate evaluates or and it\'s paramters': () => assert.strictEqual(evaluate([Symbol.for('or'), 5, 6, 7]), true),
-    'evaluate evaluates or to false if all is false': () => assert.strictEqual(evaluate([Symbol.for('or'), false, false, false]), false),
-    'evaluate evaluates or to true if one is true': () => assert.strictEqual(evaluate([Symbol.for('or'), false, true, false]), true),
+    'evaluate evaluates or to false': () => assert.strictEqual(evaluate([s('or')]), false),
+    'evaluate evaluates or and it\'s paramters': () => assert.strictEqual(evaluate([s('or'), 5, 6, 7]), true),
+    'evaluate evaluates or to false if all is false': () => assert.strictEqual(evaluate([s('or'), false, false, false]), false),
+    'evaluate evaluates or to true if one is true': () => assert.strictEqual(evaluate([s('or'), false, true, false]), true),
     'evaluate evaluates or lazily': () => {
         let call_a = 0;
         let call_b = 0;
@@ -118,23 +120,23 @@ const tests = {
         const b = () => { call_b++; return true; }
         const c = () => { call_c++; return true; }
         const env = (s) => eval(s.description);
-        evaluate([Symbol.for('or'), [Symbol.for('a')], [Symbol.for('b')], [Symbol.for('c')]], env);
+        evaluate([s('or'), [s('a')], [s('b')], [s('c')]], env);
         assert.equal(call_a, 1);
         assert.equal(call_b, 1);
         assert.equal(call_c, 0);
     },
 
-    'evaluate evaluates if true leg': () => assert.strictEqual(evaluate([Symbol.for('if'), true, 1, 2]), 1),
-    'evaluate evaluates if false leg': () => assert.strictEqual(evaluate([Symbol.for('if'), false, 1, 2]), 2),
-    'evaluate evaluates if true leg one legged': () => assert.strictEqual(evaluate([Symbol.for('if'), true, 1]), 1),
-    'evaluate evaluates if false leg one legged': () => assert.strictEqual(evaluate([Symbol.for('if'), false, 1]), undefined),
+    'evaluate evaluates if true leg': () => assert.strictEqual(evaluate([s('if'), true, 1, 2]), 1),
+    'evaluate evaluates if false leg': () => assert.strictEqual(evaluate([s('if'), false, 1, 2]), 2),
+    'evaluate evaluates if true leg one legged': () => assert.strictEqual(evaluate([s('if'), true, 1]), 1),
+    'evaluate evaluates if false leg one legged': () => assert.strictEqual(evaluate([s('if'), false, 1]), undefined),
     'evaluate evaluates if true leg and not other leg': () => {
         let call_a = 0;
         let call_b = 0;
         const a = () => { call_a++; return 1; }
         const b = () => { call_b++; return 2; }
         const env = (s) => eval(s.description);
-        evaluate([Symbol.for('if'), true, [Symbol.for('a')], [Symbol.for('b')]], env);
+        evaluate([s('if'), true, [s('a')], [s('b')]], env);
         assert.equal(call_a, 1);
         assert.equal(call_b, 0);
     },
@@ -144,16 +146,16 @@ const tests = {
         const a = () => { call_a++; return 1; }
         const b = () => { call_b++; return 2; }
         const env = (s) => eval(s.description);
-        evaluate([Symbol.for('if'), false, [Symbol.for('a')], [Symbol.for('b')]], env);
+        evaluate([s('if'), false, [s('a')], [s('b')]], env);
         assert.equal(call_a, 0);
         assert.equal(call_b, 1);
     },
 
-    'evaluate evaluates lambda to a function': () => assert.equal(true, isFunction(evaluate([Symbol.for('lambda'), [], 1]))),
-    'evaluate evaluates lambda to a function that works': () => assert.strictEqual(evaluate([Symbol.for('lambda'), [], 1])(), 1),
-    'evaluate can evaluate a lambda': () => assert.strictEqual(evaluate([[Symbol.for('lambda'), [], 1]]), 1),
-    'evaluate evaluates lambda to a function that takes an arg': () => assert.strictEqual(evaluate([Symbol.for('lambda'), [Symbol.for('a')], Symbol.for('a')])(33), 33),
-    'evaluate evaluates lambda to a function that takes args': () => assert.strictEqual(evaluate([Symbol.for('lambda'), [Symbol.for('a'), Symbol.for('b')], Symbol.for('b')])(33, 34), 34),
+    'evaluate evaluates lambda to a function': () => assert.equal(true, isFunction(evaluate([s('lambda'), [], 1]))),
+    'evaluate evaluates lambda to a function that works': () => assert.strictEqual(evaluate([s('lambda'), [], 1])(), 1),
+    'evaluate can evaluate a lambda': () => assert.strictEqual(evaluate([[s('lambda'), [], 1]]), 1),
+    'evaluate evaluates lambda to a function that takes an arg': () => assert.strictEqual(evaluate([s('lambda'), [s('a')], s('a')])(33), 33),
+    'evaluate evaluates lambda to a function that takes args': () => assert.strictEqual(evaluate([s('lambda'), [s('a'), s('b')], s('b')])(33, 34), 34),
 }
 
 
