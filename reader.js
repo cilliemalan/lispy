@@ -83,7 +83,7 @@ const read = (text, offset = 0) => {
                         } else {
                             if (end(c2) && res.length === 0) {
                                 i++;
-                                return result(null);
+                                return result([]);
                             } else {
                                 throw "unexpected situation";
                             }
