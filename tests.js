@@ -84,10 +84,6 @@ const tests = {
     'evaluate evaulates a boolean 2': () => assert.strictEqual(evaluate(false), false),
     'evaluate evaulates a string': () => assert.strictEqual(evaluate("hello world"), "hello world"),
     'evaluate evaluates a function': () => assert.strictEqual(Object.toString, Object.toString),
-    'evaluate does not evaluate null': () => assert.throws(() => evaluate(null)),
-    'evaluate does not evaluate undefined': () => assert.throws(() => evaluate(undefined)),
-    'evaluate does not evaluate nothing': () => assert.throws(() => evaluate()),
-    'evaluate does not evaluate a pair': () => assert.throws(() => evaluate(new Pair(1, 2))),
 
     'evaluate looks up a symbol': () => assert.strictEqual(evaluate(Symbol.for('symbol'), (s) => { assert.strictEqual(s, Symbol.for('symbol')); return "value" }), "value"),
     'evaluate invokes a function': () => assert.strictEqual(evaluate([Symbol.for('func')], () => () => "value"), "value"),

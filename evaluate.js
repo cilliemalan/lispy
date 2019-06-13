@@ -1,4 +1,4 @@
-const { isArray, isNumber, isBoolean, isString, isSymbol, isFunction } = require('util');
+const { isArray, isSymbol, isFunction } = require('util');
 
 const s = (x) => Symbol.for(x);
 
@@ -56,16 +56,9 @@ const evaluateInvocation = (expression, environment) => {
 }
 
 const evaluate = (expression, environment) => {
-    if (isNumber(expression)) return expression;
-    else if (isBoolean(expression)) return expression;
-    else if (isString(expression)) return expression;
-    else if (isSymbol(expression)) return environment(expression);
-    else if (isArray(expression)) {
-        return evaluateInvocation(expression, environment);
-    }
-    else {
-        throw `cannot evaluate the expression: ${expression}`;
-    }
+    if (isSymbol(expression)) return environment(expression);
+    else if (isArray(expression)) return evaluateInvocation(expression, environment);
+    else return expression;
 }
 
 module.exports = { evaluate };
