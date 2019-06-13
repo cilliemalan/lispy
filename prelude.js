@@ -18,6 +18,7 @@ module.exports = {
         prelude[s('-')] = (...args) => { if (args.length == 1) return -args[0]; let a = args[0]; args.slice(1).forEach(i => a -= i); return a; };
         prelude[s('/')] = (...args) => { if (args.length == 1) return 1 / args[0]; let a = args[0]; args.slice(1).forEach(i => a /= i); return a; };
 
+        prelude[s('array')] = (...args) => args;
 
         return (s) => {
             if (!isSymbol(s)) throw `cannot evaluate non-symbol ${s}`;

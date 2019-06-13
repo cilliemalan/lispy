@@ -176,6 +176,7 @@ const tests = {
     'prelude has car': () => assert.ok(isFunction(prelude(s('car')))),
     'prelude has cdr': () => assert.ok(isFunction(prelude(s('cdr')))),
     'prelude has math': () => assert.ok(isFunction(prelude(s('*'))) && isFunction(prelude(s('-'))) && isFunction(prelude(s('+'))) && isFunction(prelude(s('/')))),
+    'prelude has array': () => assert.ok(isFunction(prelude(s('array')))),
 
     'prelude number? identifies number': () => assert.ok(prelude(s('number?'))(55)),
     'prelude number? does not identify non-number': () => assert.ok(!prelude(s('number?'))("aa")),
@@ -204,6 +205,9 @@ const tests = {
     'prelude / divides multiple 1': () => assert.strictEqual(prelude(s('/'))(10, 3, 3), 10 / 9),
     'prelude / divides multiple 2': () => assert.strictEqual(prelude(s('/'))(10, 2, 2, 2), 10 / 8),
     'prelude / reciprocals': () => assert.strictEqual(prelude(s('/'))(10), 1 / 10),
+
+    'prelude array creates an array': () => assert.deepStrictEqual(evaluate([s('array'), 1, 2, 3], prelude), [1, 2, 3]),
+    'prelude array creates an empty array without args': () => assert.deepStrictEqual(evaluate([s('array')], prelude), []),
 }
 
 
