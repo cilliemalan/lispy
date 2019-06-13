@@ -164,6 +164,9 @@ const tests = {
     'evaluate evaluates lambda to a function that takes an arg': () => assert.strictEqual(evaluate([s('lambda'), [s('a')], s('a')])(33), 33),
     'evaluate evaluates lambda to a function that takes args': () => assert.strictEqual(evaluate([s('lambda'), [s('a'), s('b')], s('b')])(33, 34), 34),
 
+    'evaluate evaluates a quoted expression': () => assert.strictEqual(evaluate([s('quote'), 1]), 1),
+    'evaluate evaluates a quoted list': () => assert.deepStrictEqual(evaluate([s('quote'), [1, 2, 3]]), [1, 2, 3]),
+
 
     // prelude tests
     'prelude is a function': () => assert.ok(isFunction(prelude)),

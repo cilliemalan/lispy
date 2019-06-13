@@ -37,7 +37,7 @@ const evaluateInvocation = (expression, environment) => {
                 let testResult;
                 if (i === rand.length - 1 && test === s('else')) testResult = true;
                 else testResult = evaluate(test, environment) !== false;
-                if(testResult) {
+                if (testResult) {
                     let result;
                     tail.forEach(body => result = evaluate(body, environment));
                     return result;
@@ -57,6 +57,10 @@ const evaluateInvocation = (expression, environment) => {
                 bodies.forEach(body => result = evaluate(body, newEnvironment));
                 return result;
             }
+            break;
+        case s('quote'):
+            if (rand.length !== 1) throw "quote can only have one argument";
+            return rand[0];
             break;
         default:
             const func = evaluate(rator, environment);
