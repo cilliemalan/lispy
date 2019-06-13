@@ -18,6 +18,12 @@ module.exports = {
         prelude[s('-')] = (...args) => { let a = args[0]; args.slice(1).forEach(i => a -= i); return a; };
         prelude[s('/')] = (...args) => { let a = args[0]; args.slice(1).forEach(i => a /= i); return a; };
 
-        return prelude;
+
+        return (s) => {
+            if (!isSymbol(s)) throw `cannot evaluate non-symbol ${s}`;
+            const v = prelude[s];
+            if (v === undefined) throw `undefined symbol: ${s.description}`;
+            return v;
+        }
     }
 };

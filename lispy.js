@@ -20,47 +20,41 @@ Usage:
 
 const prelude = createPrelude(evaluate);
 
-const environmentLookup = (symbol) => prelude[symbol];
-
-const evaluate = (program) => evaluate(program, environmentLookup);
-
-const runCommand = (command) => {
-    for (var ix = 0; ix < command.length;) {
-        const [program, advance] = read(command, ix);
+const run = (source) => {
+    for (var ix = 0; ix < source.length;) {
+        const [program, advance] = read(source, ix);
         ix += advance;
+        let result;
         if (program !== undefined) {
-            evaluate(program);
+            result = evaluate(program, prelude);
         } else {
-            return;
+            return result;
         }
     }
 }
 
 const runFile = (file) => runCommand(readFileSync(file));
 
-
-
-
-
-
-if (args.length == 0) {
-    printUsage();
-    process.exit(1);
-} else {
-    for (let i = 0; i < args.length; i++) {
-        const arg = args[i];
-        if (arg === '-c') {
-            i++;
-            if (i >= args.length) {
-                throw "did not specify command to run";
+if (require.main === module) {
+    if (args.length == 0) {
+        printUsage();
+        process.exit(1);
+    } else {
+        for (let i = 0; i < args.length; i++) {
+            const arg = args[i];
+            if (arg === '-c') {
+                i++;
+                if (i >= args.length) {
+                    throw "did not specify command to run. -c must be followed by a command";
+                } else {
+                    runCommand(args[i]);
+                }
             } else {
-                runCommand(args[i]);
+                runFile(args[i]);
             }
-        } else {
-            runFile(args[i]);
         }
     }
 }
 
 
-module.exports = { evaluate };
+module.exports = { run, runFile };
