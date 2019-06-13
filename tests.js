@@ -1,6 +1,8 @@
 const { read } = require('./reader');
-const assert = require('assert');
 const { evaluate } = require('./evaluate');
+const { createPrelude } = require('./prelude');
+
+const assert = require('assert');
 const { isFunction } = require('util');
 
 const s = (x) => Symbol.for(x);
@@ -9,6 +11,8 @@ const readSimple = (text) => {
     const [r, _] = read(text);
     return r;
 }
+
+const prelude = createPrelude(evaluate);
 
 const tests = {
 
@@ -156,6 +160,19 @@ const tests = {
     'evaluate can evaluate a lambda': () => assert.strictEqual(evaluate([[s('lambda'), [], 1]]), 1),
     'evaluate evaluates lambda to a function that takes an arg': () => assert.strictEqual(evaluate([s('lambda'), [s('a')], s('a')])(33), 33),
     'evaluate evaluates lambda to a function that takes args': () => assert.strictEqual(evaluate([s('lambda'), [s('a'), s('b')], s('b')])(33, 34), 34),
+
+
+    // prelude tests
+    'prelude is a function': () => assert.ok(isFunction(prelude)),
+    'prelude has print': () => assert.ok(isFunction(prelude(s('print')))),
+    'prelude has number?': () => assert.ok(isFunction(prelude(s('number?')))),
+    'prelude has boolean?': () => assert.ok(isFunction(prelude(s('boolean?')))),
+    'prelude has string?': () => assert.ok(isFunction(prelude(s('string?')))),
+    'prelude has array?': () => assert.ok(isFunction(prelude(s('array?')))),
+    'prelude has symbol?': () => assert.ok(isFunction(prelude(s('symbol?')))),
+    'prelude has car': () => assert.ok(isFunction(prelude(s('car')))),
+    'prelude has cdr': () => assert.ok(isFunction(prelude(s('cdr')))),
+    'prelude has math': () => assert.ok(isFunction(prelude(s('*'))) && isFunction(prelude(s('-'))) && isFunction(prelude(s('+'))) && isFunction(prelude(s('/')))),
 }
 
 
