@@ -11,6 +11,7 @@ module.exports = {
         prelude[s('string?')] = isString;
         prelude[s('array?')] = isArray;
         prelude[s('symbol?')] = isSymbol;
+        prelude[s('empty?')] = (a) => isArray(a) && a.length === 0;
         prelude[s('car')] = (a) => { if (a.length == 0) throw "cannot car an empty array"; return a[0]; }
         prelude[s('cdr')] = (a) => a.slice(1);
         prelude[s('+')] = (...args) => { let a = 0; args.forEach(i => a += i); return a; };
