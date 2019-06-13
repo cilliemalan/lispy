@@ -154,6 +154,9 @@ const tests = {
         assert.equal(call_a, 0);
         assert.equal(call_b, 1);
     },
+    'evaluate evaluates cond': () => assert.strictEqual(evaluate([s('cond'), [false, 43], [true, 42]]), 42),
+    'evaluate evaluates cond else': () => assert.strictEqual(evaluate([s('cond'), [false, 43], [s('else'), 42]]), 42),
+    'evaluate cond returns unefined if all false': () => assert.strictEqual(evaluate([s('cond'), [false, 43], [false, 42]]), undefined),
 
     'evaluate evaluates lambda to a function': () => assert.equal(true, isFunction(evaluate([s('lambda'), [], 1]))),
     'evaluate evaluates lambda to a function that works': () => assert.strictEqual(evaluate([s('lambda'), [], 1])(), 1),

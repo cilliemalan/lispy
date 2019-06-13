@@ -29,6 +29,21 @@ const evaluateInvocation = (expression, environment) => {
                 else return evaluate(e, environment);
             }
             break;
+        case s('cond'):
+            if (rand.length == 0) throw "must specify at least one cond clause";
+            if (rand.filter(c => !isArray(c) || c.length < 2).length) throw "cond clause must be a list with at least two entries";
+            for (let i = 0; i < rand.length; i++) {
+                const [test, ...tail] = rand[i];
+                let testResult;
+                if (i === rand.length - 1 && test === s('else')) testResult = true;
+                else testResult = evaluate(test, environment) !== false;
+                if(testResult) {
+                    let result;
+                    tail.forEach(body => result = evaluate(body, environment));
+                    return result;
+                }
+            }
+            return undefined;
         case s('lambda'):
             const [arguments, ...bodies] = rand;
             if (bodies.length === 0) throw "lambda must have at least one body";
