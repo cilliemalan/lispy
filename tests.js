@@ -217,6 +217,7 @@ const tests = {
     'prelude has empty?': () => assert.ok(isFunction(prelude(s('empty?')))),
     'prelude has car': () => assert.ok(isFunction(prelude(s('car')))),
     'prelude has cdr': () => assert.ok(isFunction(prelude(s('cdr')))),
+    'prelude has cons': () => assert.ok(isFunction(prelude(s('cons')))),
     'prelude has math': () => assert.ok(isFunction(prelude(s('*'))) && isFunction(prelude(s('-'))) && isFunction(prelude(s('+'))) && isFunction(prelude(s('/')))),
     'prelude has array': () => assert.ok(isFunction(prelude(s('array')))),
 
@@ -236,6 +237,10 @@ const tests = {
     'prelude car doesn\'t like empty': () => assert.throws(() => prelude(s('car'))([])),
     'prelude cdr gets rest': () => assert.deepStrictEqual(prelude(s('cdr'))([1, 2, 3]), [2, 3]),
     'prelude cdr returns [] when empty': () => assert.deepStrictEqual(prelude(s('cdr'))([1]), []),
+    'prelude cons creates an array': () => assert.deepStrictEqual(prelude(s('cons'))(1, []), [1]),
+    'prelude cons prepends to an array': () => assert.deepStrictEqual(prelude(s('cons'))(3, [4, 5, 6]), [3, 4, 5, 6]),
+    'prelude cons does not concat': () => assert.deepStrictEqual(prelude(s('cons'))([1, 2, 3], [4, 5, 6]), [[1, 2, 3], 4, 5, 6]),
+    'prelude cons rejects non-array as second parm': () => assert.throws(() => prelude(s('cons'))(1, 2)),
 
     'prelude + sums': () => assert.strictEqual(prelude(s('+'))(1, 2, 3), 1 + 2 + 3),
     'prelude + returns single': () => assert.strictEqual(prelude(s('+'))(43), 43),

@@ -91,3 +91,5 @@ A few gotchas.
 - There is an undefined: I'm pretty sure javascript has a `undefined` because of it's
   scheme roots. In the rare cases where an expresssion doesn't return (for example a one-
   legged if) it will return `undefined`. There is no way to test for it.
+- No pairs: Lispy has no pairs. Though you can call `cons`, the second paramter must
+  be some kind of array and will produce an array. The terminator is `[]`.

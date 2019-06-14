@@ -14,6 +14,7 @@ module.exports = {
         prelude[s('empty?')] = (a) => isArray(a) && a.length === 0;
         prelude[s('car')] = (a) => { if (a.length == 0) throw "cannot car an empty array"; return a[0]; }
         prelude[s('cdr')] = (a) => a.slice(1);
+        prelude[s('cons')] = (a, b) => { if (!isArray(b)) throw "cons must have array as second arg"; return [a].concat(b); }
         prelude[s('+')] = (...args) => { let a = 0; args.forEach(i => a += i); return a; };
         prelude[s('*')] = (...args) => { let a = 1; args.forEach(i => a *= i); return a; };
         prelude[s('-')] = (...args) => { if (args.length == 1) return -args[0]; let a = args[0]; args.slice(1).forEach(i => a -= i); return a; };
