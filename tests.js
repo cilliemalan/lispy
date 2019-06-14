@@ -164,6 +164,44 @@ const tests = {
     'evaluate evaluates lambda to a function that takes an arg': () => assert.strictEqual(evaluate([s('lambda'), [s('a')], s('a')])(33), 33),
     'evaluate evaluates lambda to a function that takes args': () => assert.strictEqual(evaluate([s('lambda'), [s('a'), s('b')], s('b')])(33, 34), 34),
 
+    'evaluate evaluates macro to a function': () => assert.equal(true, isFunction(evaluate([s('macro'), [s('_')], 1]))),
+    'evaluate evaluates macro to a function that works': () => assert.strictEqual(evaluate([s('macro'), [s('_')], 1])([]), 1),
+    'evaluate macro gets passed input syntax': () => {
+        const macro = [s('macro'), [s('_')], [s('test'), s('_')]];
+        const invocation = [macro, 1, 2, 3];
+        let argpassed;
+        const environment = (sym) => {
+            if (sym === s('test')) return (syntax) => {
+                argpassed = syntax;
+                return 42;
+            }
+        }
+        const result = evaluate(invocation, environment);
+        assert.strictEqual(result, 42);
+        assert.deepStrictEqual(argpassed, [1, 2, 3])
+    },
+    'evaluate macro transforms syntax': () => {
+        const macro = [s('macro'), [s('_')], [s('test'), s('_')]];
+        const invocation = [macro, 1, [s('+'), 2, 3]];
+        let argpassed1;
+        let argpassed2;
+        const environment = (sym) => {
+            if (sym === s('test')) return (syntax) => {
+                argpassed1 = syntax;
+                return [s('sum'), ...syntax];
+            };
+            else if (sym === s('sum')) return (...args) => {
+                argpassed2 = args;
+                return prelude(s('+'))(...args);
+            };
+            else return prelude(sym);
+        }
+        const result = evaluate(invocation, environment);
+        assert.strictEqual(result, 6);
+        assert.deepStrictEqual(argpassed1, [1, [s('+'), 2, 3]]);
+        assert.deepStrictEqual(argpassed2, [1, 5]);
+    },
+
     'evaluate evaluates a quoted expression': () => assert.strictEqual(evaluate([s('quote'), 1]), 1),
     'evaluate evaluates a quoted list': () => assert.deepStrictEqual(evaluate([s('quote'), [1, 2, 3]]), [1, 2, 3]),
 

@@ -57,7 +57,20 @@ const evaluateInvocation = (expression, environment) => {
                 bodies.forEach(body => result = evaluate(body, newEnvironment));
                 return result;
             }
-            break;
+        case s('macro'):
+            const [[argument, ...invalidarg], body, ...invalid] = rand;
+            if (invalid.length !== 0) throw "macro must have exactly one body";
+            if (invalidarg.length !== 0) throw "macro must have exactly one paramter";
+            if (!isSymbol(argument)) throw "the argument to a macro must be a symbol";
+            let macro = (...arguments) => {
+                const newEnvironment = (s) => s === argument
+                    ? arguments
+                    : environment(s);
+                const newBody = evaluate(body, newEnvironment);
+                return evaluate(newBody, environment);
+            }
+            macro[s('macro')] = true;
+            return macro;
         case s('quote'):
             if (rand.length !== 1) throw "quote can only have one argument";
             return rand[0];
@@ -66,8 +79,12 @@ const evaluateInvocation = (expression, environment) => {
             const func = evaluate(rator, environment);
 
             if (isFunction(func)) {
-                var args = rand.map(r => evaluate(r, environment));
-                return func.apply(null, args);
+                if (func[s('macro')]) {
+                    return func.apply(null, rand);
+                } else {
+                    var args = rand.map(r => evaluate(r, environment));
+                    return func.apply(null, args);
+                }
             } else {
                 throw `cannot invoke non-function: ${rator}`;
             }
