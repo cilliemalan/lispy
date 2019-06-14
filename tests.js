@@ -218,8 +218,8 @@ const tests = {
     'prelude has car': () => assert.ok(isFunction(prelude(s('car')))),
     'prelude has cdr': () => assert.ok(isFunction(prelude(s('cdr')))),
     'prelude has cons': () => assert.ok(isFunction(prelude(s('cons')))),
-    'prelude has math': () => assert.ok(isFunction(prelude(s('*'))) && isFunction(prelude(s('-'))) && isFunction(prelude(s('+'))) && isFunction(prelude(s('/')))),
     'prelude has array': () => assert.ok(isFunction(prelude(s('array')))),
+    'prelude has math': () => assert.ok(isFunction(prelude(s('*'))) && isFunction(prelude(s('-'))) && isFunction(prelude(s('+'))) && isFunction(prelude(s('/')))),
 
     'prelude number? identifies number': () => assert.ok(prelude(s('number?'))(55)),
     'prelude number? does not identify non-number': () => assert.ok(!prelude(s('number?'))("aa")),
@@ -241,6 +241,8 @@ const tests = {
     'prelude cons prepends to an array': () => assert.deepStrictEqual(prelude(s('cons'))(3, [4, 5, 6]), [3, 4, 5, 6]),
     'prelude cons does not concat': () => assert.deepStrictEqual(prelude(s('cons'))([1, 2, 3], [4, 5, 6]), [[1, 2, 3], 4, 5, 6]),
     'prelude cons rejects non-array as second parm': () => assert.throws(() => prelude(s('cons'))(1, 2)),
+    'prelude array creates an array': () => assert.deepStrictEqual(evaluate([s('array'), 1, 2, 3], prelude), [1, 2, 3]),
+    'prelude array creates an empty array without args': () => assert.deepStrictEqual(evaluate([s('array')], prelude), []),
 
     'prelude + sums': () => assert.strictEqual(prelude(s('+'))(1, 2, 3), 1 + 2 + 3),
     'prelude + returns single': () => assert.strictEqual(prelude(s('+'))(43), 43),
@@ -255,9 +257,6 @@ const tests = {
     'prelude / divides multiple 1': () => assert.strictEqual(prelude(s('/'))(10, 3, 3), 10 / 9),
     'prelude / divides multiple 2': () => assert.strictEqual(prelude(s('/'))(10, 2, 2, 2), 10 / 8),
     'prelude / reciprocals': () => assert.strictEqual(prelude(s('/'))(10), 1 / 10),
-
-    'prelude array creates an array': () => assert.deepStrictEqual(evaluate([s('array'), 1, 2, 3], prelude), [1, 2, 3]),
-    'prelude array creates an empty array without args': () => assert.deepStrictEqual(evaluate([s('array')], prelude), []),
 }
 
 
