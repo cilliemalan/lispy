@@ -225,6 +225,8 @@ const tests = {
     'prelude has array': () => assert.ok(isFunction(prelude(s('array')))),
     'prelude has nth': () => assert.ok(isFunction(prelude(s('nth')))),
     'prelude has math': () => assert.ok(isFunction(prelude(s('*'))) && isFunction(prelude(s('-'))) && isFunction(prelude(s('+'))) && isFunction(prelude(s('/')))),
+    'prelude has import': () => assert.ok(isFunction(prelude(s('import')))),
+    'prelude has object': () => assert.ok(isFunction(prelude(s('object')))),
 
     'prelude number? identifies number': () => assert.ok(prelude(s('number?'))(55)),
     'prelude number? does not identify non-number': () => assert.ok(!prelude(s('number?'))("aa")),
@@ -266,6 +268,11 @@ const tests = {
     'prelude / divides multiple 1': () => assert.strictEqual(prelude(s('/'))(10, 3, 3), 10 / 9),
     'prelude / divides multiple 2': () => assert.strictEqual(prelude(s('/'))(10, 2, 2, 2), 10 / 8),
     'prelude / reciprocals': () => assert.strictEqual(prelude(s('/'))(10), 1 / 10),
+
+    'prelude import imports': () => assert.strictEqual(prelude(s('import'))('fs').readFileSync, require('fs').readFileSync),
+    'prelude object creates objects': () => assert.deepStrictEqual(prelude(s('object'))([['a', 1], ['b', 2]]), { a: 1, b: 2 }),
+    'prelude -> accesses things with string': () => assert.strictEqual(prelude(s('->'))({ a: 1, b: 2, c: 3 }, 'b'), 2),
+    'prelude -> accesses things with symbol': () => assert.strictEqual(prelude(s('->'))({ a: 1, b: 2, c: 3 }, Symbol.for('b')), 2),
 }
 
 

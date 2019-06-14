@@ -1,4 +1,4 @@
-const { isArray, isSymbol, isString, isBoolean, isNumber } = require('util');
+const { isArray, isSymbol, isString, isBoolean, isNumber, isObject } = require('util');
 
 module.exports = {
     createPrelude: (eval) => {
@@ -31,6 +31,16 @@ module.exports = {
         prelude[s('*')] = (...args) => { let a = 1; args.forEach(i => a *= i); return a; };
         prelude[s('-')] = (...args) => { if (args.length == 1) return -args[0]; let a = args[0]; args.slice(1).forEach(i => a -= i); return a; };
         prelude[s('/')] = (...args) => { if (args.length == 1) return 1 / args[0]; let a = args[0]; args.slice(1).forEach(i => a /= i); return a; };
+
+        const macro = (f) => { f[s('macro')] = true; return f; }
+        prelude[s('import')] = (module) => require(module);
+        prelude[s('object')] = macro((entries) => Object.fromEntries(entries));
+        prelude[s('->')] = (ob, key) => {
+            if (!isObject(ob)) throw "-> can only be used on objects";
+            if (isSymbol(key)) return ob[key.description];
+            else if (isString(key)) return ob[key];
+            else throw "-> must have a symbol or string as a second arg";
+        }
 
         return (s) => {
             if (!isSymbol(s)) throw `cannot evaluate non-symbol ${s}`;
