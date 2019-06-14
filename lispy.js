@@ -33,7 +33,7 @@ const run = (source) => {
     }
 }
 
-const runFile = (file) => runCommand(readFileSync(file));
+const runFile = (file) => run(readFileSync(file).toString());
 
 if (require.main === module) {
     if (args.length == 0) {
