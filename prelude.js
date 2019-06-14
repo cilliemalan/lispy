@@ -1,9 +1,16 @@
-const { isArray, isSymbol, isString, isBoolean, isNumber, isObject } = require('util');
+const { isArray, isSymbol, isString, isBoolean, isNumber, isObject, isFunction } = require('util');
 
 module.exports = {
     createPrelude: (eval) => {
         const prelude = {};
         const s = (n) => Symbol.for(n);
+
+        const lookup = (s) => {
+            if (!isSymbol(s)) throw `cannot evaluate non-symbol ${s}`;
+            const v = prelude[s];
+            if (v === undefined) throw `undefined symbol: ${s.description}`;
+            return v;
+        }
 
         prelude[s('print')] = (...args) => console.log(...args);
         prelude[s('number?')] = isNumber;
@@ -37,24 +44,22 @@ module.exports = {
         prelude[s('object')] = macro((entries) => Object.fromEntries(entries));
         prelude[s('->')] = (ob, key) => {
             if (!isObject(ob)) throw "-> can only be used on objects";
-            if (isSymbol(key)) return ob[key.description];
-            else if (isString(key)) return ob[key];
+            if (isString(key)) {
+                const result = ob[key];
+                if (isFunction(result)) return result.bind(ob);
+                else return result;
+            }
             else throw "-> must have a symbol or string as a second arg";
         };
 
         prelude[s('define')] = macro((...args) => {
             const [name, value] = args;
             if (!isSymbol(name)) throw "name must be a symbol";
-            const evaluatedValue = eval(value);
+            const evaluatedValue = eval(value, lookup);
             prelude[name] = evaluatedValue;
             return evaluatedValue;
         });
 
-        return (s) => {
-            if (!isSymbol(s)) throw `cannot evaluate non-symbol ${s}`;
-            const v = prelude[s];
-            if (v === undefined) throw `undefined symbol: ${s.description}`;
-            return v;
-        }
+        return lookup;
     }
 };
