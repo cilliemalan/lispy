@@ -9,6 +9,14 @@
             "request": "launch",
             "name": "Tests",
             "program": "${workspaceFolder}\\tests.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Webserver",
+            "program": "${workspaceFolder}/lispy.js",
+            "cwd": "${workspaceFolder}/examples",
+            "args": ["${workspaceFolder}/examples/webserver.ss"]
         }
     ]
 }
