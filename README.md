@@ -4,6 +4,9 @@ lisp is all about lists, lispy is all about arrays. Maybe it should be called
 asp? Anyway. The difference doesn't really matter in practice.
 
 It's a tiny lisp interpreter with a basic parser and mostly javascript types.
+It has an extremely small number of built-in functions and is missing a whole
+bunch of proper lisp features such as bindings, proper lexical closures,
+continuations.
 
 ## But why?
 Lispy is an example in how to create a simple programming language.
@@ -48,7 +51,12 @@ So with that in mind, the different kinds of "things" in the lispy language are:
 - symbols
 - functions
 Of the above 6, the parser can only spit out the top 5. Each of the above corresponds
-to its javascript equivalent, though symbols have radically different symmantics, of course.
+to its javascript equivalent, though symbols have radically different symmantics.
+
+Lispy also implicitly supports javascript types, although it cannot ordinarily produce
+some of them. Some functions in the prelude produce javascript objects (such as `import`) and
+the `->` function can access properties. The `object` function can create objects by
+calling `Object.fromEntries`.
 
 ### Numbers and Strings
 These are exactly their javascript counterparts and behave the same. Numbers are not magic
@@ -74,9 +82,40 @@ by the parser. Functions are created by calling the lambda built-in function. Fu
 with an *invocation expression* which is, as we've seen before, an array where the first item is
 the function to be invoked.
 
+#### Function syntax
+```lisp
+; a basic function
+(lambda () (print "hello world"))
+
+; defining a function and calling it
+(define printhello (lambda () (print "hello world")))
+(printhello)
+
+; a function that takes an argument
+(define printhello (lambda (name) (print (str "hello world" name))))
+(printhello "mary")
+
+; unlike scheme, functions support rest parameters by
+; adding ... in front of arguments
+(define printnums (lambda (...numbers) (print numbers)))
+```
+
 ## Macros
-I need to figure this out still...lispy as of yet has no concept of bindings, closure, or continuations
-so macros are a bit out of reach...
+lispy supports gheto macros like so:
+```lisp
+(define quote (macro (stuff) stuff))
+```
+`macro` works like lambda, but only supports one argument. That argument will
+be passed the program structure instead of evaluating it. So if the quote
+procedure above is called like so: `(quote 1 2 3)`, the body of macro will
+be called with the argument stuff being `(1 2 3)`.
+
+In regular scheme a macro is a function bound to a symbol as a transformer
+(afaik). We don't have bindings at all so we make do by adding a (javascript) symbol as
+a property on the function when it is designated as a macro. When the interpreter
+encounteres a function to be invoked, it checks for that property and if it is there
+it sends the arguments as a list to the function application. If it is not there
+the arguments are evaluated one-by-one and passed to the function as arguments.
 
 # Different from LISP or Scheme
 A few gotchas.
@@ -86,9 +125,9 @@ A few gotchas.
 - Objects don't exist but they do: javascript can produce objects and so
   lispy has them too.....we just pretend they only exist as an abstract concept.
 - There is no null: `(array)` returns an empty array, not an empty "list" or `null`.
-- #f is still the only false: If you somehow create a null by calling javascript, it
-  will still evaluate to true in an if, cond, and, or or statement.
-- There is an undefined: I'm pretty sure javascript has a `undefined` because of it's
+- `#f` is still the only false: If you somehow create a null by calling javascript, it
+  will still evaluate to true in an `if`, `cond`, `and`, or `or` statement.
+- There is an undefined: I'm pretty sure javascript has `undefined` because of its
   scheme roots. In the rare cases where an expresssion doesn't return (for example a one-
   legged if) it will return `undefined`. There is no way to test for it.
 - No pairs: Lispy has no pairs. Though you can call `cons`, the second paramter must
