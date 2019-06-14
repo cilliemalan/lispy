@@ -273,6 +273,11 @@ const tests = {
     'prelude object creates objects': () => assert.deepStrictEqual(prelude(s('object'))([['a', 1], ['b', 2]]), { a: 1, b: 2 }),
     'prelude -> accesses things with string': () => assert.strictEqual(prelude(s('->'))({ a: 1, b: 2, c: 3 }, 'b'), 2),
     'prelude -> accesses things with symbol': () => assert.strictEqual(prelude(s('->'))({ a: 1, b: 2, c: 3 }, Symbol.for('b')), 2),
+
+    'prelude define defines': () => {
+        evaluate([s('define'), s('a'), 5], prelude);
+        assert.strictEqual(evaluate(s('a'), prelude), 5);
+    }
 }
 
 

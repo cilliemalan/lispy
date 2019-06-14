@@ -40,7 +40,15 @@ module.exports = {
             if (isSymbol(key)) return ob[key.description];
             else if (isString(key)) return ob[key];
             else throw "-> must have a symbol or string as a second arg";
-        }
+        };
+
+        prelude[s('define')] = macro((...args) => {
+            const [name, value] = args;
+            if (!isSymbol(name)) throw "name must be a symbol";
+            const evaluatedValue = eval(value);
+            prelude[name] = evaluatedValue;
+            return evaluatedValue;
+        });
 
         return (s) => {
             if (!isSymbol(s)) throw `cannot evaluate non-symbol ${s}`;
