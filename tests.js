@@ -163,6 +163,10 @@ const tests = {
     'evaluate can evaluate a lambda': () => assert.strictEqual(evaluate([[s('lambda'), [], 1]]), 1),
     'evaluate evaluates lambda to a function that takes an arg': () => assert.strictEqual(evaluate([s('lambda'), [s('a')], s('a')])(33), 33),
     'evaluate evaluates lambda to a function that takes args': () => assert.strictEqual(evaluate([s('lambda'), [s('a'), s('b')], s('b')])(33, 34), 34),
+    'evaluate lambda throws with too many args': () => assert.throws(() => evaluate([s('lambda'), [s('a')], s('a')])(1, 2, 3)),
+    'evaluate lambda supports rest args': () => assert.deepStrictEqual(evaluate([s('lambda'), [s('a'), s('b'), s('...c')], s('c')])(1, 2, 3, 4, 5), [3, 4, 5]),
+    'evaluate lambda with default rest supports too many args': () => assert.deepStrictEqual(evaluate([s('lambda'), [s('...')], 42])(1, 2, 3), 42),
+    'evaluate lambda supports only one rest args': () => assert.throws(() => evaluate([s('lambda'), [s('a'), s('...b'), s('...c')], s('c')])),
 
     'evaluate evaluates macro to a function': () => assert.equal(true, isFunction(evaluate([s('macro'), [s('_')], 1]))),
     'evaluate evaluates macro to a function that works': () => assert.strictEqual(evaluate([s('macro'), [s('_')], 1])([]), 1),

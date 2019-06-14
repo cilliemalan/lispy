@@ -48,11 +48,24 @@ const evaluateInvocation = (expression, environment) => {
             const [arguments, ...bodies] = rand;
             if (bodies.length === 0) throw "lambda must have at least one body";
             if (arguments.filter(a => !isSymbol(a)).length != 0) throw "arguments must be a list of symbols";
-            const argumentIndexMap = new Map(arguments.map((a, i) => [a, i]));
+            if (arguments.filter((a, i) => /\.\.\..*/.test(a.description) && i != arguments.length - 1).length != 0) throw "only the last arg can be a rest arg";
+            const argumentIndexMap = new Map(arguments
+                .filter(a => !/\.\.\..*/.test(a.description))
+                .map((a, i) => [a, i]));
+            const restArg = arguments.length > 0 && arguments[arguments.length - 1].description.match(/^\.\.\.(.+)?$/);
+            const namedRestArg = restArg && s(restArg[1]);
+            const restArgIndex = restArg && arguments.length - 1;
             return (...arguments) => {
-                const newEnvironment = (s) => argumentIndexMap.has(s)
-                    ? arguments[argumentIndexMap.get(s)]
-                    : environment(s);
+                const newEnvironment = (s) => {
+                    if (argumentIndexMap.has(s)) {
+                        return arguments[argumentIndexMap.get(s)];
+                    } else if (namedRestArg && s === namedRestArg) {
+                        return arguments.slice(restArgIndex);
+                    } else {
+                        return environment(s);
+                    }
+                }
+                if (!restArg && arguments.length > argumentIndexMap.size) throw "too many arguments";
                 let result;
                 bodies.forEach(body => result = evaluate(body, newEnvironment));
                 return result;
