@@ -219,6 +219,7 @@ const tests = {
     'prelude has cdr': () => assert.ok(isFunction(prelude(s('cdr')))),
     'prelude has cons': () => assert.ok(isFunction(prelude(s('cons')))),
     'prelude has array': () => assert.ok(isFunction(prelude(s('array')))),
+    'prelude has nth': () => assert.ok(isFunction(prelude(s('nth')))),
     'prelude has math': () => assert.ok(isFunction(prelude(s('*'))) && isFunction(prelude(s('-'))) && isFunction(prelude(s('+'))) && isFunction(prelude(s('/')))),
 
     'prelude number? identifies number': () => assert.ok(prelude(s('number?'))(55)),
@@ -243,6 +244,8 @@ const tests = {
     'prelude cons rejects non-array as second parm': () => assert.throws(() => prelude(s('cons'))(1, 2)),
     'prelude array creates an array': () => assert.deepStrictEqual(evaluate([s('array'), 1, 2, 3], prelude), [1, 2, 3]),
     'prelude array creates an empty array without args': () => assert.deepStrictEqual(evaluate([s('array')], prelude), []),
+    'prelude nth subscripts an array': () => assert.deepStrictEqual(prelude(s('nth'))(3, [1, 2, 3, 4, 5, 6]), 4),
+    'prelude nth throws out of bounds': () => assert.throws(() => prelude(s('nth'))(-1, [1])),
 
     'prelude + sums': () => assert.strictEqual(prelude(s('+'))(1, 2, 3), 1 + 2 + 3),
     'prelude + returns single': () => assert.strictEqual(prelude(s('+'))(43), 43),

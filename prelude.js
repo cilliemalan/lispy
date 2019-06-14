@@ -16,6 +16,15 @@ module.exports = {
         prelude[s('cdr')] = (a) => a.slice(1);
         prelude[s('cons')] = (a, b) => { if (!isArray(b)) throw "cons must have array as second arg"; return [a].concat(b); }
         prelude[s('array')] = (...args) => args;
+        prelude[s('nth')] = (ix, arr) => {
+            if (!isNumber(ix)) throw "nth must have number as first arg";
+            if (!isArray(arr)) throw "nth must have array as second arg";
+            ix = parseInt(ix);
+            if (isNaN(ix)) throw "ix cannot be nan";
+            if (!isFinite(ix)) throw "ix must be finite";
+            if (ix < 0 || ix >= arr.length) throw "ix was out of bounds of the array";
+            return arr[ix];
+        }
 
         prelude[s('+')] = (...args) => { let a = 0; args.forEach(i => a += i); return a; };
         prelude[s('*')] = (...args) => { let a = 1; args.forEach(i => a *= i); return a; };
