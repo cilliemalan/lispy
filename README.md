@@ -1,5 +1,24 @@
 # lispy
-lispy is a very tiny pretend-lisp interpreter. I say pretend because whereas
+lispy is a very tiny pretend-lisp interpreter.
+
+```lisp
+(define http (import "http"))
+(define fs (import "fs"))
+
+; define a new server
+(define server
+    ((-> http "createServer")
+        (lambda (req res) 
+            ((-> res "writeHead") 200 (object (["Content-Type" "text/html"])))
+            ((-> res "end") ((-> fs "readFileSync") "index.html"))
+        )))
+
+; listen on port 4000
+((-> server "listen") 4000)
+(print "listening on port 4000")
+```
+
+I say pretend because whereas
 lisp is all about lists, lispy is all about arrays. Maybe it should be called
 asp? Anyway. The difference doesn't really matter in practice.
 
