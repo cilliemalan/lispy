@@ -25,6 +25,7 @@ module.exports = {
             if (ix < 0 || ix >= arr.length) throw "ix was out of bounds of the array";
             return arr[ix];
         }
+        prelude[s('length')] = (arr) => { if (!isArray(arr)) throw "length must have array as second arg"; return arr.length; }
 
         prelude[s('+')] = (...args) => { let a = 0; args.forEach(i => a += i); return a; };
         prelude[s('*')] = (...args) => { let a = 1; args.forEach(i => a *= i); return a; };

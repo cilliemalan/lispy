@@ -246,6 +246,8 @@ const tests = {
     'prelude array creates an empty array without args': () => assert.deepStrictEqual(evaluate([s('array')], prelude), []),
     'prelude nth subscripts an array': () => assert.deepStrictEqual(prelude(s('nth'))(3, [1, 2, 3, 4, 5, 6]), 4),
     'prelude nth throws out of bounds': () => assert.throws(() => prelude(s('nth'))(-1, [1])),
+    'prelude length gets length of array': () => assert.deepStrictEqual(prelude(s('length'))([1, 2, 3, 4, 5, 6]), 6),
+    'prelude length gets length of empty array': () => assert.deepStrictEqual(prelude(s('length'))([]), 0),
 
     'prelude + sums': () => assert.strictEqual(prelude(s('+'))(1, 2, 3), 1 + 2 + 3),
     'prelude + returns single': () => assert.strictEqual(prelude(s('+'))(43), 43),
